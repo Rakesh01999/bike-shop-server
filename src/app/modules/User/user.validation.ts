@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { USER_STATUS } from './user.constant';
 
 const userValidationSchema = z.object({
   pasword: z
@@ -10,12 +9,48 @@ const userValidationSchema = z.object({
     .optional(),
 });
 
-const changeStatusValidationSchema = z.object({
+// const changeStatusValidationSchema = z.object({
+//   body: z.object({
+//     status: z.enum([...USER_STATUS] as [string, ...string[]]),
+//   }),
+// });
+
+// Validation schema for creating a customer
+const createCustomerValidationSchema = z.object({
   body: z.object({
-    status: z.enum([...USER_STATUS] as [string, ...string[]]),
+    customer: z.object({
+      name: z.string({ required_error: 'Name is required.' }),
+      email: z.string({ required_error: 'Email is required.' }).email('Invalid email format.'),
+      password: z.string({ required_error: 'Password is required.' }),
+    }), 
   }),
 });
+
+// Validation schema for creating an admin
+const createAdminValidationSchema = z.object({
+  body: z.object({
+    admin: z.object({
+      name: z.string({ required_error: 'Name is required.' }),
+      email: z.string({ required_error: 'Email is required.' }).email('Invalid email format.'),
+      password: z.string({ required_error: 'Password is required.' }),
+    }),
+  }),
+});
+
+// Validation schema for changing user status
+const changeStatusValidationSchema = z.object({
+  body: z.object({
+    status: z.enum(['active', 'blocked', ], {
+      required_error: 'Status is required.',
+      invalid_type_error: 'Invalid status provided.',
+    }),
+  }),
+});
+
+
 export const UserValidation = {
   userValidationSchema,
   changeStatusValidationSchema,
+  createCustomerValidationSchema,
+  createAdminValidationSchema,
 };
