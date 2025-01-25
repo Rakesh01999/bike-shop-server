@@ -11,6 +11,7 @@ export interface TUser {
   role: keyof typeof USER_ROLE; // Role values based on USER_ROLE constant
   status: typeof USER_STATUS[number]; // Status values based on USER_STATUS constant
   isDeleted: boolean;
+  profileImg?: string; 
 }
 
 export interface UserModel extends Model<TUser> {
