@@ -6,5 +6,4 @@ export const USER_ROLE = {
 export const USER_STATUS = [
     'active',
     'blocked',
-    'pending'
 ] as const;
