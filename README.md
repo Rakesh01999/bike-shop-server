@@ -1,5 +1,6 @@
 
-# Bike Management System
+# Bike Shop
+## Bike Management System
 
 A Bike Management System built with Express.js, MongoDB, and TypeScript that allows users to manage bike information including CRUD operations such as creating, reading, updating, and deleting bikes, as well as searching bikes by various parameters.
 
