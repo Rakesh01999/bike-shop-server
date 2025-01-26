@@ -26,7 +26,7 @@ const createCustomerIntoDB = async (file: any, password: string, payload: Partia
 
     // Check if a profile image file is provided
     if (file) {
-      const imageName = `${userData.id || payload.email}`;
+      const imageName = `${userData._id || payload.email}`;
       const path = file.path;
 
       // Upload the image to Cloudinary
@@ -69,7 +69,7 @@ const createAdminIntoDB = async (file: any, password: string, payload: Partial<T
 
     // Check if a profile image file is provided
     if (file) {
-      const imageName = `${userData.id || payload.email}`;
+      const imageName = `${userData._id || payload.email}`;
       const path = file.path;
 
       // Upload the image to Cloudinary

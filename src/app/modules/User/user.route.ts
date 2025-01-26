@@ -12,14 +12,16 @@ const router = express.Router();
  * Create a customer
  */
 router.post(
-  '/create-customer',
-  auth('admin'), // Only admin can create customers
-  upload.single('file'), // Upload customer profile image
+  // '/create-customer',
+  '/create-user',
+  // auth('admin'), // Only admin can create customers
+  // upload.single('file'), // Upload customer profile image
   (req: Request, res: Response, next: NextFunction) => {
     req.body = JSON.parse(req.body.data); // Parse the body from the multipart request
     next();
   },
-  validateRequest(UserValidation.createCustomerValidationSchema), // Validate customer creation data
+  // validateRequest(UserValidation.createCustomerValidationSchema), // Validate customer creation data
+  validateRequest(UserValidation.createUserValidationSchema), // Validate customer creation data
   UserControllers.createCustomer, // Controller to handle customer creation
 );
 

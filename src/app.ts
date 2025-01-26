@@ -2,12 +2,17 @@ import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import { BikeRoutes } from './app/modules/bike/bike.route';
 import { OrderRoutes } from './app/modules/order/order.route';
+import cookieParser from 'cookie-parser';
 
 const app: Application = express();
 
 // parser
 app.use(express.json());
-app.use(cors());
+app.use(cookieParser());
+
+// app.use(cors());
+app.use(cors({ origin: ['http://localhost:5173'], credentials: true }));
+
 
 // /api/v1/bikes/create-bike
 // /api/v1/products/create-bike

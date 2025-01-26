@@ -16,13 +16,20 @@ const userValidationSchema = z.object({
 // });
 
 // Validation schema for creating a customer
-const createCustomerValidationSchema = z.object({
+// const createCustomerValidationSchema = z.object({
+//   body: z.object({
+//     user: z.object({
+//       name: z.string({ required_error: 'Name is required.' }),
+//       email: z.string({ required_error: 'Email is required.' }).email('Invalid email format.'),
+//       password: z.string({ required_error: 'Password is required.' }),
+//     }), 
+//   }),
+// });
+const createUserValidationSchema = z.object({
   body: z.object({
-    customer: z.object({
       name: z.string({ required_error: 'Name is required.' }),
       email: z.string({ required_error: 'Email is required.' }).email('Invalid email format.'),
       password: z.string({ required_error: 'Password is required.' }),
-    }), 
   }),
 });
 
@@ -51,6 +58,7 @@ const changeStatusValidationSchema = z.object({
 export const UserValidation = {
   userValidationSchema,
   changeStatusValidationSchema,
-  createCustomerValidationSchema,
+  // createCustomerValidationSchema,
   createAdminValidationSchema,
+  createUserValidationSchema,
 };
