@@ -32,7 +32,7 @@ const bikeValidationSchema = z.object({
   inStock: z.boolean().optional().default(true),
   // createdAt: z.date().default(() => new Date()),
   // updatedAt: z.date().default(() => new Date()),
-  isDeleted: z.boolean(),
+  isDeleted: z.boolean().optional(),
 });
 export default bikeValidationSchema;
 

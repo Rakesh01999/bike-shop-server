@@ -116,52 +116,6 @@ bikeSchema.statics.reduceStock = async function (id: string, quantity: number) {
   await bike.save();
 };
 
-// Order Schema Definition
-// const orderSchema = new Schema<TOrder, OrderModel>(
-//   {
-//     email: {
-//       type: String,
-//       required: [true, 'Email is required'],
-//       //   validate: {
-//       //     validator: (value: string) => validator.isEmail(value),
-//       //     message: '{VALUE} is not a valid email address',
-//       //   },
-//     },
-//     product: {
-//       type: Schema.Types.ObjectId,
-//       ref: 'Bike',
-//       required: [true, 'Product reference is required'],
-//     },
-//     quantity: {
-//       type: Number,
-//       required: [true, 'Quantity is required'],
-//       min: [1, 'Order quantity must be at least 1'],
-//     },
-//     totalPrice: {
-//       type: Number,
-//       required: [true, 'Total price is required'],
-//       min: [0, 'Total price must be a positive number'],
-//     },
-//     createdAt: {
-//       type: Date,
-//       default: Date.now,
-//     },
-//     updatedAt: {
-//       type: Date,
-//       default: Date.now,
-//     },
-//   },
-//   {
-//     timestamps: true,
-//   }
-// );
-
-// Static Methods for Orders
-// orderSchema.statics.calculateRevenue = async function () {
-//   const orders = await this.find();
-//   return orders.reduce((total, order) => total + order.totalPrice, 0);
-// };
-
 bikeSchema.statics.isBikeExists = async function (modelNumber: string) {
   const bike = await this.findOne({ modelNumber });
   return !!bike; // Return true if a bike exists, otherwise false

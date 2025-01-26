@@ -23,7 +23,7 @@ export type TBike = {
     inStock: boolean;
     createdAt?: Date;
     updatedAt?: Date;
-    isDeleted: boolean;
+    isDeleted?: boolean;
 };
 
 // Define the type for the Order

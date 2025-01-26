@@ -1,6 +1,5 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
-import { BikeRoutes } from './app/modules/bike/bike.route';
 import { OrderRoutes } from './app/modules/order/order.route';
 import cookieParser from 'cookie-parser';
 import router from './app/routes';
