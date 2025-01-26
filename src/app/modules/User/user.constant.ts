@@ -1,9 +1,4 @@
 export const USER_ROLE = {
-    customer: 'customer',
+    user: 'customer',
     admin: 'admin',
 } as const;
-
-export const USER_STATUS = [
-    'active',
-    'blocked',
-] as const;

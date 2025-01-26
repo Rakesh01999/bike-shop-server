@@ -11,3 +11,9 @@ export type TLoginUser = {
   email: string; // User's email for login
   password: string; // User's password for login
 };
+
+// export type TLoginUser = {
+//   id: string;
+//   password: string;
+// };
+

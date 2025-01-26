@@ -1,64 +1,37 @@
 import { z } from 'zod';
 
-const userValidationSchema = z.object({
-  pasword: z
-    .string({
-      invalid_type_error: 'Password must be string',
-    })
-    .max(20, { message: 'Password can not be more than 20 characters' })
-    .optional(),
-});
-
-// const changeStatusValidationSchema = z.object({
-//   body: z.object({
-//     status: z.enum([...USER_STATUS] as [string, ...string[]]),
-//   }),
-// });
-
-// Validation schema for creating a customer
-// const createCustomerValidationSchema = z.object({
-//   body: z.object({
-//     user: z.object({
-//       name: z.string({ required_error: 'Name is required.' }),
-//       email: z.string({ required_error: 'Email is required.' }).email('Invalid email format.'),
-//       password: z.string({ required_error: 'Password is required.' }),
-//     }), 
-//   }),
-// });
-const createUserValidationSchema = z.object({
+export const createUserValidationSchema = z.object({
   body: z.object({
-      name: z.string({ required_error: 'Name is required.' }),
-      email: z.string({ required_error: 'Email is required.' }).email('Invalid email format.'),
-      password: z.string({ required_error: 'Password is required.' }),
+    name: z
+      .string()
+      .min(1, 'Name is required')
+      .max(50, 'Name cannot exceed 50 characters'),
+    email: z.string().email('Invalid email format').min(1, 'Email is required'),
+    password: z
+      .string()
+      .min(6, 'Password must be at least 6 characters')
+      .max(20, 'Password cannot exceed 20 characters'),
+    role: z
+      .enum(['admin', 'customer'], {
+        invalid_type_error: "Role must be either 'admin' or 'customer'",
+      })
+      .default('customer'),
+    isBlocked: z.boolean().default(false),
   }),
 });
 
-// Validation schema for creating an admin
-const createAdminValidationSchema = z.object({
+export const updateUserValidationSchema = z.object({
   body: z.object({
-    admin: z.object({
-      name: z.string({ required_error: 'Name is required.' }),
-      email: z.string({ required_error: 'Email is required.' }).email('Invalid email format.'),
-      password: z.string({ required_error: 'Password is required.' }),
-    }),
+    name: z.string().max(50).optional(),
+    email: z.string().email().optional(),
+    password: z.string().min(6).max(20).optional(),
+    role: z.enum(['admin', 'customer']).optional(),
+    isBlocked: z.boolean().optional(),
+    updatedAt: z.date().default(() => new Date()),
   }),
 });
 
-// Validation schema for changing user status
-const changeStatusValidationSchema = z.object({
-  body: z.object({
-    status: z.enum(['active', 'blocked', ], {
-      required_error: 'Status is required.',
-      invalid_type_error: 'Invalid status provided.',
-    }),
-  }),
-});
-
-
-export const UserValidation = {
-  userValidationSchema,
-  changeStatusValidationSchema,
-  // createCustomerValidationSchema,
-  createAdminValidationSchema,
+export const userValidations = {
   createUserValidationSchema,
+  updateUserValidationSchema,
 };
