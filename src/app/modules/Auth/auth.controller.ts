@@ -48,6 +48,7 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
   const { email, password } = req.body;
   console.log(req.body);
   // Authenticate user/admin and get tokens
+  // const { accessToken, needsPasswordChange } =
   const { accessToken, needsPasswordChange, role } =
     await AuthServices.loginUser({
       email,
