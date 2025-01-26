@@ -4,7 +4,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../config';
 import AppError from '../errors/AppError';
 import { TUserRole } from '../modules/User/user.interface';
-import { User } from '../modules/User/user.model';
+import { UserModel } from '../modules/User/user.model';
 import catchAsync from '../utils/catchAsync';
 
 const auth = (...requiredRoles: TUserRole[]) => {
@@ -17,15 +17,31 @@ const auth = (...requiredRoles: TUserRole[]) => {
     }
 
     // checking if the given token is valid
-    const decoded = jwt.verify(
-      token,
-      config.jwt_access_secret as string,
-    ) as JwtPayload;
+    // const decoded = jwt.verify(
+    //   token,
+    //   config.jwt_access_secret as string,
+    // ) as JwtPayload;
+
+    // Verify the token
+    let decoded: JwtPayload & { role?: string; userId?: string; iat?: number };
+
+    try {
+      decoded = jwt.verify(
+        token,
+        config.jwt_access_secret as string
+      ) as JwtPayload & { role?: string; userId?: string; iat?: number };
+    } catch (err) {
+      throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid or expired token!');
+      console.log(err);
+    }
+
 
     const { role, userId, iat } = decoded;
 
-    // checking if the user is exist
-    const user = await User.isUserExistsByCustomId(userId);
+    // checking if the user exists in DB
+    // const user = await UserModel.isUserExistsByCustomId(userId);
+    // const user = await UserModel.findOne({ email });
+    const user = await UserModel.findById(userId);
 
     if (!user) {
       throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
@@ -45,20 +61,38 @@ const auth = (...requiredRoles: TUserRole[]) => {
       throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
     }
 
+    // if (
+    //   user.passwordChangedAt &&
+    //   UserModel.isJWTIssuedBeforePasswordChanged(
+    //     user.passwordChangedAt,
+    //     iat as number,
+    //   )
+    // ) {
+    //   throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized !');
+    // }
+
+    // if (requiredRoles && !requiredRoles.includes(role)) {
+    //   throw new AppError(
+    //     httpStatus.UNAUTHORIZED,
+    //     'You are not authorized  hi!',
+    //   );
+    // }
+    // Check if the token was issued before the user's password was changed
     if (
       user.passwordChangedAt &&
-      User.isJWTIssuedBeforePasswordChanged(
-        user.passwordChangedAt,
-        iat as number,
-      )
+      user.passwordChangedAt.getTime() / 1000 > (iat || 0)
     ) {
-      throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized !');
-    }
-
-    if (requiredRoles && !requiredRoles.includes(role)) {
       throw new AppError(
         httpStatus.UNAUTHORIZED,
-        'You are not authorized  hi!',
+        'Token is invalid as the password has been changed!'
+      );
+    }
+
+    // Check if the user's role matches the required roles
+    if (requiredRoles.length && !requiredRoles.includes(role as TUserRole)) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        'You do not have the required permissions!'
       );
     }
 
