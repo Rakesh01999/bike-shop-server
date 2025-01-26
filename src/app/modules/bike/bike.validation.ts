@@ -1,17 +1,16 @@
 import { z } from "zod";
-
 // Updated Bike validation schema
 const bikeValidationSchema = z.object({
-  modelNumber: z
-    .string()
-    .min(1, "Model Number is required")
+  modelNumber: z.string({
+    required_error: 'Model Number is required'
+  }).min(1, 'Model Number cannot be empty')
     .refine(
-      (value) => /^[a-zA-Z0-9-]+$/.test(value), // Allows letters, numbers, and dashes
-      { message: "Model Number can only contain letters, numbers, and dashes" }
+      (value) => /^[a-zA-Z0-9-]+$/.test(value),
+      { message: 'Model Number can only contain letters, numbers, and dashes' }
     ),
-  name: z
-    .string()
-    .min(1, "Bike name is required")
+  name: z.string({
+    required_error: 'Bike name is required'
+  }).min(2, 'Bike name must be at least 2 characters')
     .max(50, "Bike name cannot exceed 50 characters")
     .refine(
       (value) => value.charAt(0) === value.charAt(0).toUpperCase(),
@@ -30,10 +29,10 @@ const bikeValidationSchema = z.object({
     .int("Quantity must be an integer")
     .nonnegative("Quantity must be a non-negative integer"),
   description: z.string().min(1, "Description is required"),
-  inStock: z.boolean().default(true),
-  createdAt: z.date().default(() => new Date()),
-  updatedAt: z.date().default(() => new Date()),
+  inStock: z.boolean().optional().default(true),
+  // createdAt: z.date().default(() => new Date()),
+  // updatedAt: z.date().default(() => new Date()),
   isDeleted: z.boolean(),
 });
-
 export default bikeValidationSchema;
+

@@ -20,6 +20,8 @@ export const getAllBikesFromDB = async (filter: FilterQuery<TBike>) => {
     }
 };
 
+
+
 const getSingleBikeFromDB = async (id: string) => {
     const result = await Bike.aggregate([{ $match: { modelNumber: id } }]);
     return result;

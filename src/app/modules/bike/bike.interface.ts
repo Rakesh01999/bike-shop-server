@@ -1,5 +1,15 @@
 // import { Schema, model, Model, Types } from 'mongoose';
-import { Model} from 'mongoose';
+import { Model } from 'mongoose';
+
+export const BIKE_CATEGORY = {
+    MOUNTAIN: 'Mountain',
+    ROAD: 'Road',
+    HYBRID: 'Hybrid',
+    ELECTRIC: 'Electric'
+} as const;
+
+export type TBikeCategory = typeof BIKE_CATEGORY[keyof typeof BIKE_CATEGORY];
+
 
 // Define the type for the Product (Bike)
 export type TBike = {
@@ -31,8 +41,8 @@ export interface BikeModel extends Model<TBike> {
     /* eslint-disable no-unused-vars */
     isBikeAvailable(id: string): Promise<TBike | null>;
     reduceStock(id: string, quantity: number): Promise<void>;
-    isBikeExists(modelNumber: string): Promise<boolean>; 
-     
+    isBikeExists(modelNumber: string): Promise<boolean>;
+
 }
 
 
