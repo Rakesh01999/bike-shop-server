@@ -1,17 +1,16 @@
 import { Router } from 'express';
 import { UserRoutes } from '../modules/User/user.route';
 import { BikeRoutes } from '../modules/bike/bike.route';
-// import { AuthRoutes } from './modules/auth/auth.route';
+import { AuthRoutes } from '../modules/Auth/auth.route';
 // import { OrderRoutes } from './modules/order/order.route';
-// import { UserRoutes } from '../modules/User/user.route';
 
 const router = Router();
 
 const moduleRoutes = [
-//   {
-//     path: '/auth',
-//     route: AuthRoutes, // User registration, login
-//   },
+  {
+    path: '/auth',
+    route: AuthRoutes, // User registration, login
+  },
   {
     path: '/products',
     route: BikeRoutes, // Product(Bike) CRUD operations
