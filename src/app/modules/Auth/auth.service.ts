@@ -1,11 +1,11 @@
 import bcrypt from 'bcrypt';
 import httpStatus from 'http-status';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+// import jwt, { JwtPayload } from 'jsonwebtoken';
 import { UserModel } from '../User/user.model';
 import AppError from '../../errors/AppError';
 import { createToken } from './auth.utils';
 import config from '../../config';
-import { USER_ROLE } from '../User/user.constant';
+// import { USER_ROLE } from '../User/user.constant';
 // import { Admin } from '../Admin/admin.model';
 
 const registerUser = async (payload: {
@@ -50,11 +50,19 @@ const registerUser = async (payload: {
 // const loginUser = async (payload: { email: string; password: string }) => {
 //   const { email, password } = payload;
 
-//   console.log(email);
-//   console.log(password);
-//   // Find user by email
-//   const user = await UserModel.findOne({ email });
-//   console.log(user?.password);
+//   // console.log('f-service', email);
+
+//   // Try finding the user in both UserModel and Admin collections
+//   // let user = await UserModel.findOne({ email }); // Query UserModel first
+//   const user = await UserModel.findOne({ email }); // Query UserModel first
+//   // let isAdmin = false;
+
+//   // if (!user) {
+//   //   user = await Admin.findOne({ email }); // Query Admin collection if not found in UserModel
+//   //   isAdmin = true; // Mark as admin for later checks
+//   // }
+
+//   // console.log('f-service user', user);
 
 //   if (!user) {
 //     throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid credentials');
@@ -68,14 +76,23 @@ const registerUser = async (payload: {
 //     throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted');
 //   }
 
-//   // Verify password
+//   // Verify password using bcrypt
 //   // const isPasswordMatched = await bcrypt.compare(password, user.password);
 //   // if (!isPasswordMatched) {
-//   //     throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid credentials');
+//   //   throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid credentials');
 //   // }
+
 //   if (user.password !== password) {
 //     throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid credentials');
 //   }
+
+//   // Verify role
+//   // if (isAdmin && user.role !== USER_ROLE.admin) {
+//   //   throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized as admin');
+//   // }
+//   // if (!isAdmin && user.role !== USER_ROLE.user) {
+//   //   throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized as a user');
+//   // }
 
 //   // Create JWT payload
 //   const jwtPayload = {
@@ -83,85 +100,50 @@ const registerUser = async (payload: {
 //     role: user.role,
 //   };
 
-//   // Generate access and refresh tokens
+//   // Generate access token
 //   const accessToken = createToken(
 //     jwtPayload,
 //     config.jwt_access_secret as string,
-//     config.jwt_access_expires_in as string,
+//     // config.jwt_access_expires_in as string,
 //   );
 
 //   return {
 //     accessToken,
 //     needsPasswordChange: user.needsPasswordChange,
+//     role: user.role,
 //   };
 // };
 
+// ----------------
 
-// const registerUser = async (user: User): Promise<User> => {
-//   const result = await UserModel.create(user); // Create user using the UserModel
-//   return result;
-// };
-//  ------------- mode -------------
-
-
-const loginUser = async (payload: { email: string; password: string }) => {
-  const { email, password } = payload;
-
-  // console.log('f-service', email);
-
-  // Try finding the user in both UserModel and Admin collections
-  // let user = await UserModel.findOne({ email }); // Query UserModel first
-  const user = await UserModel.findOne({ email }); // Query UserModel first
-  // let isAdmin = false;
-
-  // if (!user) {
-  //   user = await Admin.findOne({ email }); // Query Admin collection if not found in UserModel
-  //   isAdmin = true; // Mark as admin for later checks
-  // }
-
-  // console.log('f-service user', user);
+const loginUser = async ({ email, password }: { email: string; password: string }) => {
+  const user = await UserModel.findOne({ email });
 
   if (!user) {
     throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid credentials');
   }
 
-  // Check if the user is blocked or deleted
   if (user.isBlocked) {
     throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked');
   }
+
   if (user.isDeleted) {
     throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted');
   }
 
-  // Verify password using bcrypt
-  // const isPasswordMatched = await bcrypt.compare(password, user.password);
-  // if (!isPasswordMatched) {
-  //   throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid credentials');
-  // }
-
-  if (user.password !== password) {
+  if (!(await bcrypt.compare(password, user.password))) {
     throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid credentials');
   }
 
-  // Verify role
-  // if (isAdmin && user.role !== USER_ROLE.admin) {
-  //   throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized as admin');
-  // }
-  // if (!isAdmin && user.role !== USER_ROLE.user) {
-  //   throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized as a user');
-  // }
-
-  // Create JWT payload
   const jwtPayload = {
-    userId: user._id.toString(), // Convert ObjectId to string
+    userId: user._id.toString(),
     role: user.role,
   };
 
-  // Generate access token
   const accessToken = createToken(
     jwtPayload,
     config.jwt_access_secret as string,
-    // config.jwt_access_expires_in as string,
+    config.jwt_access_expires_in as string,
   );
 
   return {
@@ -171,8 +153,7 @@ const loginUser = async (payload: { email: string; password: string }) => {
   };
 };
 
-
-//  ------------- mode ^ -------------
+// ----------------
 
 export const AuthServices = {
   registerUser,
