@@ -3,7 +3,8 @@ import { Model } from 'mongoose';
 import { USER_ROLE, USER_STATUS } from './user.constant';
 
 export interface TUser {
-  id: string;
+  _id: string;
+  name: string;
   email: string;
   password: string;
   needsPasswordChange: boolean;
@@ -16,7 +17,7 @@ export interface TUser {
 
 export interface UserModel extends Model<TUser> {
   // Instance methods for checking if the user exists by custom ID
-  isUserExistsByCustomId(id: string): Promise<TUser | null>;
+  isUserExistsById(_id: string): Promise<TUser | null>;
 
   // Instance methods for checking if passwords match
   isPasswordMatched(

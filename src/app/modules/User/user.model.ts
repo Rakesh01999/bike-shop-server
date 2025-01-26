@@ -7,9 +7,8 @@ import { TUser, UserModel } from './user.interface';
 
 const userSchema = new Schema<TUser, UserModel>(
     {
-        id: {
+        _id: {
             type: String,
-            required: true,
             unique: true,
         },
         email: {
