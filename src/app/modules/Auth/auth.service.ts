@@ -149,7 +149,7 @@ const loginUser = async ({ email, password }: { email: string; password: string 
   return {
     accessToken,
     needsPasswordChange: user.needsPasswordChange,
-    role: user.role,
+    // role: user.role,
   };
 };
 
