@@ -10,7 +10,8 @@ import catchAsync from '../utils/catchAsync';
 const auth = (...requiredRoles: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const token = req.headers.authorization;
-
+    // const token = req.headers.authorization?.split(' ')[1];
+    
     // checking if the token is missing
     if (!token) {
       throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized!');
@@ -36,12 +37,14 @@ const auth = (...requiredRoles: TUserRole[]) => {
     }
 
 
-    const { role, userId, iat } = decoded;
+    const { role, userId, email, iat } = decoded;
+    // const { role, email, iat } = decoded;
 
     // checking if the user exists in DB
     // const user = await UserModel.isUserExistsByCustomId(userId);
     // const user = await UserModel.findOne({ email });
     const user = await UserModel.findById(userId);
+    console.log('f-At:',user);
 
     if (!user) {
       throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
@@ -96,7 +99,8 @@ const auth = (...requiredRoles: TUserRole[]) => {
       );
     }
 
-    req.user = decoded as JwtPayload & { role: string };
+    // req.user = decoded as JwtPayload & { role: string };
+    req.user = user;
     next();
   });
 };

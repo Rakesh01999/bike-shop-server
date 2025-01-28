@@ -1,105 +1,51 @@
-import { Request, Response } from 'express';
-import { Order } from './order.model';
-import { Bike } from '../bike/bike.model';
-import mongoose from 'mongoose';
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
+// import { orderService } from "./order.service";
+import httpStatus from "http-status";
+import { OrderService } from "./order.service";
+import { Order } from "./order.model";
+// import { UserModel } from "../User/user.model";
 
-// Create an order and update inventory
-const createOrder = async (req: Request, res: Response): Promise<void> => {
-    const session = await mongoose.startSession(); // Start a session for atomic operations
-    session.startTransaction();
+const createOrder = catchAsync(async (req, res) => {
+    const user = req.user;
+    // const user = await UserModel.findOne({ email: req.user.email });
+    console.log('f-OC', user);
 
-    try {
-        const { email, product, quantity } = req.body;
+    // const order = await OrderService.createOrderInDB(user, req.body, req.ip!);
+    const order = await OrderService.createOrderInDB(user, req.body, req.ip!);
 
-        // Validate input
-        if (!email || !product || !quantity) {
-            res.status(400).json({
-                success: false,
-                message: 'Email, product, and quantity are required',
-            });
-            return; // Stop execution
-        }
+    sendResponse(res, {
+        statusCode: httpStatus.CREATED,
+        success: true,
+        message: "Order placed successfully",
+        data: order,
+    });
+});
 
-        // Check if the product exists
-        const bike = await Bike.findById(product).session(session);
+const getOrders = catchAsync(async (req, res) => {
+    const order = await OrderService.getOrdersFromDB();
 
-        // Handle case where bike is null
-        if (!bike) {
-            res.status(404).json({
-                success: false,
-                message: 'Product not found',
-            });
-            return; // Stop execution
-        }
+    sendResponse(res, {
+        statusCode: httpStatus.CREATED,
+        success: true,
+        message: "Order retrieved successfully",
+        data: order,
+    });
+});
 
-        // Handle case where bike is deleted
-        if (bike.isDeleted) {
-            res.status(404).json({
-                success: false,
-                message: 'Product is no longer available',
-            });
-            return; // Stop execution
-        }
+const verifyPayment = catchAsync(async (req, res) => {
+    const order = await OrderService.verifyPayment(req.query.order_id as string);
 
-        // Check inventory stock
-        if (bike.quantity < quantity) {
-            res.status(400).json({
-                success: false,
-                message: 'Insufficient stock to fulfill the order',
-            });
-            return; // Stop execution
-        }
-
-        // Calculate total price
-        const totalPrice = bike.price * quantity;
-
-        // Reduce the bike's quantity and update `inStock` status
-        bike.quantity -= quantity;
-        if (bike.quantity === 0) {
-            bike.inStock = false;
-        }
-        await bike.save({ session }); // Save the updated bike in the same session
-
-        // Create the order
-        const newOrder = await Order.create([{ email, product, quantity, totalPrice }], { session });
-
-        // Commit transaction
-        await session.commitTransaction();
-        session.endSession();
-
-        // Construct response with `_id` at the top
-        const responseData = {
-            _id: newOrder[0]._id,
-            email: newOrder[0].email,
-            product: newOrder[0].product,
-            quantity: newOrder[0].quantity,
-            totalPrice: newOrder[0].totalPrice,
-            createdAt: newOrder[0].createdAt,
-            updatedAt: newOrder[0].updatedAt,
-        };
-
-        // Send the response
-        res.status(201).json({
-            success: true,
-            message: 'Order created successfully',
-            data: responseData,
-        });
-    } catch (error) {
-        // Rollback transaction if an error occurs
-        await session.abortTransaction();
-        session.endSession();
-
-        console.error('Error creating order:', error);
-        res.status(500).json({
-            success: false,
-            message: 'An error occurred while creating the order',
-            error: error instanceof Error ? error.message : 'Unknown error',
-        });
-    }
-};
+    sendResponse(res, {
+        statusCode: httpStatus.CREATED,
+        success: true,
+        message: "Order verified successfully",
+        data: order,
+    });
+});
 
 // Calculate total revenue from all orders
-const calculateRevenue = async (req: Request, res: Response): Promise<void> => {
+const calculateRevenue = async (req, res) => {
     try {
         const totalRevenue = await Order.aggregate([
             { $group: { _id: null, totalRevenue: { $sum: '$totalPrice' } } },
@@ -107,9 +53,17 @@ const calculateRevenue = async (req: Request, res: Response): Promise<void> => {
 
         const revenue = totalRevenue[0]?.totalRevenue || 0;
 
-        res.status(200).json({
+        // res.status(200).json({
+        //     success: true,
+        //     message: 'Revenue calculated successfully',
+        //     data: {
+        //         totalRevenue: revenue,
+        //     },
+        // });
+        sendResponse(res, {
+            statusCode: httpStatus.CREATED,
             success: true,
-            message: 'Revenue calculated successfully',
+            message: "Order retrieved successfully",
             data: {
                 totalRevenue: revenue,
             },
@@ -120,15 +74,18 @@ const calculateRevenue = async (req: Request, res: Response): Promise<void> => {
             error instanceof Error ? error.message : 'An unexpected error occurred';
 
         console.error('Error calculating revenue:', errorMessage);
-        res.status(500).json({
+        // res.status(500).json({
+        //     success: false,
+        //     message: errorMessage,
+        // });
+        sendResponse(res, {
+            statusCode: httpStatus.BAD_REQUEST,
             success: false,
             message: errorMessage,
+            data: res,
         });
     }
 };
 
-// Export the OrderController
-export const OrderController = {
-    createOrder,
-    calculateRevenue,
-};
+
+export const OrderController = { createOrder, verifyPayment, getOrders, calculateRevenue };
