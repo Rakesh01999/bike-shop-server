@@ -1,6 +1,8 @@
+import { Document } from 'mongoose';
 import { USER_ROLE } from './user.constant';
 
-export interface TUser {
+// export interface TUser {
+export interface TUser extends Document {
   // id?: string;
   name: string;
   email: string;
