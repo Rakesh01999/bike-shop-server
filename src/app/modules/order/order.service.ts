@@ -15,7 +15,7 @@ const createOrderInDB = async (
     }
 
     const products = payload.products;
-
+    
     let totalPrice = 0;
 
     const productDetails = await Promise.all(
@@ -69,7 +69,7 @@ const createOrderInDB = async (
     };
 
     // Make payment with SurjoPay
-    const payment = await orderUtils.makePaymentAsync(surjopayPayload);
+    const payment = await orderUtils.makePayment(surjopayPayload);
 
     if (payment?.transactionStatus) {
         await order.updateOne({
@@ -81,6 +81,12 @@ const createOrderInDB = async (
     }
 
     return payment.checkout_url; // Return the checkout URL for the client to redirect to
+};
+
+
+const getOrdersFromDB = async () => {
+    const data = await Order.find();
+    return data;
 };
 
 const verifyPayment = async (order_id: string) => {
@@ -112,11 +118,6 @@ const verifyPayment = async (order_id: string) => {
     }
 
     return verifiedPayment;
-};
-
-const getOrdersFromDB = async () => {
-    const data = await Order.find();
-    return data;
 };
 
 export const OrderService = {

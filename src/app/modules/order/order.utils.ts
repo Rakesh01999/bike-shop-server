@@ -1,6 +1,20 @@
 import Shurjopay, { PaymentResponse, VerificationResponse } from "shurjopay";
 import config from "../../config";
 
+// Define the payload type
+// type TPaymentPayload = {
+//   amount: number; // Payment amount
+//   order_id: string; // Unique order ID
+//   currency: string; // Payment currency (e.g., "BDT")
+//   customer_name: string; // Customer's full name
+//   customer_email: string; // Customer's email address
+//   client_ip: string; // Customer's IP address
+//   customer_phone?: string; // Optional phone number
+//   customer_address?: string; // Optional address
+//   customer_city?: string; // Optional city
+// };
+
+// Initialize ShurjoPay
 const shurjopay = new Shurjopay();
 
 shurjopay.config(
@@ -11,9 +25,9 @@ shurjopay.config(
   config.sp.sp_return_url!
 );
 
-// console.log(shurjopay);
 
-const makePaymentAsync = async (
+// Create a payment
+const makePayment = async (
   paymentPayload: any
 ): Promise<PaymentResponse> => {
   return new Promise((resolve, reject) => {
@@ -23,21 +37,9 @@ const makePaymentAsync = async (
       (error) => reject(error)
     );
   });
-
-  //   const paymentResult = await shurjopay.makePayment(
-  //     paymentPayload,
-  //     (response) => {
-  //       sendResponse(res, {
-  //         statusCode: 200,
-  //         message: "Order placed successfully",
-  //         data: response,
-  //       });
-  //     },
-  //     (error) => console.log(error)
-  //   );
-  //   return paymentResult;
 };
 
+// Verify a payment
 const verifyPaymentAsync = (
   order_id: string
 ): Promise<VerificationResponse[]> => {
@@ -50,7 +52,8 @@ const verifyPaymentAsync = (
   });
 };
 
+// Export utility functions
 export const orderUtils = {
-  makePaymentAsync,
+  makePayment,
   verifyPaymentAsync,
 };
