@@ -6,6 +6,9 @@ export interface TUser extends Document {
   // id?: string;
   name: string;
   email: string;
+  phone?: string;
+  address?: string;
+  city?: string;
   password: string;
   needsPasswordChange: boolean;
   passwordChangedAt?: Date;

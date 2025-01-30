@@ -72,8 +72,9 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     stack: config.NODE_ENV === 'development' ? err.stack : null, // Only include stack trace in development mode
   });
 
+  return ;
   // Explicitly call next to ensure proper middleware flow
-  next();
+  // next();
 };
 
 export default globalErrorHandler;

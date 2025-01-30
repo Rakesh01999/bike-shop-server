@@ -18,33 +18,30 @@ const auth = (...requiredRoles: TUserRole[]) => {
     }
 
     // checking if the given token is valid
-    // const decoded = jwt.verify(
-    //   token,
-    //   config.jwt_access_secret as string,
-    // ) as JwtPayload;
+    const decoded = jwt.verify(
+      token,
+      config.jwt_access_secret as string,
+    ) as JwtPayload;
 
     // Verify the token
-    let decoded: JwtPayload & { role?: string; userId?: string; iat?: number };
+    // let decoded: JwtPayload & { role?: string; userId?: string; iat?: number };
+    // try {
+    //   decoded = jwt.verify(
+    //     token,
+    //     config.jwt_access_secret as string
+    //   ) as JwtPayload & { role?: string; userId?: string; iat?: number };
+    // } catch (err) {
+    //   throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid or expired token!');
+    //   console.log(err);
+    // }
 
-    try {
-      decoded = jwt.verify(
-        token,
-        config.jwt_access_secret as string
-      ) as JwtPayload & { role?: string; userId?: string; iat?: number };
-    } catch (err) {
-      throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid or expired token!');
-      console.log(err);
-    }
 
-
-    const { role, userId, email, iat } = decoded;
-    // const { role, email, iat } = decoded;
+    const { role, userId, iat } = decoded;
 
     // checking if the user exists in DB
     // const user = await UserModel.isUserExistsByCustomId(userId);
     // const user = await UserModel.findOne({ email });
     const user = await UserModel.findById(userId);
-    console.log('f-At:',user);
 
     if (!user) {
       throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
@@ -64,22 +61,6 @@ const auth = (...requiredRoles: TUserRole[]) => {
       throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
     }
 
-    // if (
-    //   user.passwordChangedAt &&
-    //   UserModel.isJWTIssuedBeforePasswordChanged(
-    //     user.passwordChangedAt,
-    //     iat as number,
-    //   )
-    // ) {
-    //   throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized !');
-    // }
-
-    // if (requiredRoles && !requiredRoles.includes(role)) {
-    //   throw new AppError(
-    //     httpStatus.UNAUTHORIZED,
-    //     'You are not authorized  hi!',
-    //   );
-    // }
     // Check if the token was issued before the user's password was changed
     if (
       user.passwordChangedAt &&
