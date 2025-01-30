@@ -39,14 +39,12 @@ const auth = (...requiredRoles: TUserRole[]) => {
     const { role, userId, iat } = decoded;
 
     // checking if the user exists in DB
-    // const user = await UserModel.isUserExistsByCustomId(userId);
     // const user = await UserModel.findOne({ email });
     const user = await UserModel.findById(userId);
 
     if (!user) {
       throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
     }
-    // checking if the user is already deleted
 
     const isDeleted = user?.isDeleted;
 
