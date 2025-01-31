@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { BIKE_CATEGORY } from "./bike.interface";
 // Updated Bike validation schema
 const bikeValidationSchema = z.object({
   modelNumber: z.string({
@@ -17,7 +18,9 @@ const bikeValidationSchema = z.object({
       { message: "Bike name must start with a capital letter" }
     ),
   brand: z.string().min(1, "Brand is required"),
-  category: z.enum(["Mountain", "Road", "Hybrid", "Electric"], {
+  // category: z.enum(["Mountain", "Road", "Hybrid", "Electric"], {
+  category: z.enum(Object.values(BIKE_CATEGORY) as [string, ...string[]], {
+    required_error: "Category is required",
     invalid_type_error: "Invalid category",
   }),
   price: z
