@@ -3,105 +3,71 @@ import { BikeServices } from './bike.service';
 import bikeValidationSchema from './bike.validation';
 import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
+import catchAsync from '../../utils/catchAsync';
+import AppError from '../../errors/AppError';
 
-// const createBike = async (req: Request, res: Response): Promise<Response> => {
-const createBike = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const { bike: bikeData } = req.body;
-
-        // Validate the incoming data using Zod
-        const validatedData = bikeValidationSchema.parse(bikeData);
-
-        // Save the bike to the database
-        const result = await BikeServices.createBikeInDB(validatedData);
-        // const result = await BikeServices.createBikeInDB(bikeData);
-
-        // return res.status(200).json({
-        res.status(200).json({
-            success: true,
-            message: 'Bike created successfully',
-            data: result,
-        });
-    }
-    catch (err) {
-        // console.error(err);
-        console.log(err);
-
-        // Handle validation errors or unexpected errors
-        if (err instanceof Error) {
-            res.status(500).json({
-                success: false,
-                message: 'Error creating bike',
-                error: err.message,
-            });
-        }
-
-        res.status(500).json({
-            success: false,
-            message: 'An unknown error occurred',
-            error: String(err),
-        });
-    }
-};
-
-
-// const getAllBikes = async (req: Request, res: Response): Promise<Response> => {
-// const getAllBikes = async (req: Request, res: Response): Promise<void> => {
+// const createBike = async (req: Request, res: Response): Promise<void> => {
 //     try {
-//         const { searchTerm } = req.query;
+//         const { bike: bikeData } = req.body;
 
-//         // Define the type of the filter object
-//         const filter: Record<string, unknown> = { isDeleted: false }; // Always exclude deleted bikes
+//         // Validate the incoming data using Zod
+//         const validatedData = bikeValidationSchema.parse(bikeData);
 
-//         if (searchTerm) {
-//             const regex = new RegExp(searchTerm as string, 'i');
-//             filter.$or = [
-//                 { name: regex },
-//                 { brand: regex },
-//                 { category: regex },
-//             ];
-//         }
+//         // Save the bike to the database
+//         const result = await BikeServices.createBikeInDB(validatedData);
+//         // const result = await BikeServices.createBikeInDB(bikeData);
 
-//         const bikes = await Bike.find(filter);
+//         // return res.status(200).json({
+//         res.status(200).json({
+//             success: true,
+//             message: 'Bike created successfully',
+//             data: result,
+//         });
+//     }
+//     catch (err) {
+//         // console.error(err);
+//         console.log(err);
 
-//         if (bikes.length === 0) {
-//             res.status(404).json({
+//         // Handle validation errors or unexpected errors
+//         if (err instanceof Error) {
+//             res.status(500).json({
 //                 success: false,
-//                 message: "No bikes found matching the search criteria",
-//                 data: [],
+//                 message: 'Error creating bike',
+//                 error: err.message,
 //             });
 //         }
 
-//         res.status(200).json({
-//             success: true,
-//             message: "Bikes fetched successfully",
-//             data: bikes,
-//         });
-//     } catch (error) {
-//         console.error("Error fetching bikes:", error);
-
-//         // Explicitly return in the catch block to satisfy the compiler
 //         res.status(500).json({
 //             success: false,
-//             message: "An error occurred while fetching bikes",
+//             message: 'An unknown error occurred',
+//             error: String(err),
 //         });
 //     }
 // };
 
+const createBike = catchAsync(async (req: Request, res: Response) => {
+    const { bike: bikeData } = req.body;
+    const validatedData = bikeValidationSchema.parse(bikeData);
+    const result = await BikeServices.createBikeInDB(validatedData);
+
+    sendResponse(res, {
+        statusCode: httpStatus.CREATED,
+        success: true,
+        message: 'Bike created successfully',
+        data: result,
+    });
+});
+
 const getAllBikes = async (req: Request, res: Response): Promise<void> => {
     const { page, limit, sortBy, sortOrder, searchTerm, category } = req.query;
-
     // Build filter object
     const filter: Record<string, unknown> = { isDeleted: false }; // Ensure only non-deleted bikes are fetched
-
     if (searchTerm) {
         filter.name = new RegExp(searchTerm as string, 'i'); // Search by bike name
     }
-
     if (category) {
         filter.category = category; // Filter by category if provided
     }
-
     // Construct query
     const query = {
         filter,
@@ -110,10 +76,8 @@ const getAllBikes = async (req: Request, res: Response): Promise<void> => {
         sortBy: (sortBy as string) || 'createdAt',
         sortOrder: (sortOrder as 'asc' | 'desc') || 'desc',
     };
-
     try {
         const result = await BikeServices.getAllBikesFromDB(query);
-
         sendResponse(res, {
             statusCode: httpStatus.OK,
             success: true,
@@ -136,44 +100,45 @@ const getAllBikes = async (req: Request, res: Response): Promise<void> => {
     }
 };
 
-const getSingleBike = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const { bikeId } = req.params;
+// const getSingleBike = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//         const { bikeId } = req.params;
 
-        const result = await BikeServices.getSingleBikeFromDB(bikeId);
+//         const result = await BikeServices.getSingleBikeFromDB(bikeId);
 
-        res.status(200).json({
-            success: true,
-            message: 'Bike retrieved successfully',
-            data: result,
-        });
-    } catch (err: unknown) {
-        if (err instanceof Error) {
-            res.status(500).json({
-                success: false,
-                message: err.message || 'Something went wrong',
-                error: err,
-            });
-        }
-        // Unexpected error fallback
-        res.status(500).json({
-            success: false,
-            message: 'An unknown error occurred',
-        });
-    }
-};
+//         res.status(200).json({
+//             success: true,
+//             message: 'Bike retrieved successfully',
+//             data: result,
+//         });
+//     } catch (err: unknown) {
+//         if (err instanceof Error) {
+//             res.status(500).json({
+//                 success: false,
+//                 message: err.message || 'Something went wrong',
+//                 error: err,
+//             });
+//         }
+//         // Unexpected error fallback
+//         res.status(500).json({
+//             success: false,
+//             message: 'An unknown error occurred',
+//         });
+//     }
+// };
 
-// const getSingleBike = catchAsync(async (req: Request, res: Response) => {
-//     const { id } = req.params;
-//     const result = await BikeServices.getSingleBikeFromDB(id);
+const getSingleBike = catchAsync(async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const result = await BikeServices.getSingleBikeFromDB(id);
 
-//     sendResponse(res, {
-//         statusCode: httpStatus.OK,
-//         success: true,
-//         message: 'Bike retrieved successfully',
-//         data: result,
-//     });
-// });
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Bike retrieved successfully',
+        data: result,
+    });
+});
+
 
 const getBikeByIdOrModelNumber = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -201,8 +166,6 @@ const getBikeByIdOrModelNumber = async (req: Request, res: Response): Promise<vo
         });
     }
 };
-
-
 // export const getBikeById = async (req: Request, res: Response): Promise<Response> => {
 export const getBikeById = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -277,8 +240,11 @@ const deleteBike = async (req: Request, res: Response): Promise<void> => {
 
 export const updateBikeHandler = async (req: Request, res: Response): Promise<void> => {
     const { productId } = req.params; // Extract product ID from route params
-    const updateData = req.body;     // Extract update data from request body
 
+    if (!productId) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Bike Not Found !');
+    }
+    const updateData = req.body;     // Extract update data from request body
     try {
         // Call the service to update the bike
         const updatedBike = await BikeServices.updateBikeInDB(productId, updateData);
@@ -297,16 +263,24 @@ export const updateBikeHandler = async (req: Request, res: Response): Promise<vo
     } catch (error) {
         // Handle errors and send appropriate response
         if (error instanceof Error) {
-            res.status(400).json({
+            // res.status(400).json({
+            //     success: false,
+            //     message: error.message || 'Could not update the bike',
+            // });
+            sendResponse(res, {
+                statusCode: httpStatus.BAD_REQUEST,
                 success: false,
                 message: error.message || 'Could not update the bike',
+                data: updateData,
             });
         }
 
         // Handle unexpected error types
-        res.status(500).json({
+        sendResponse(res, {
+            statusCode: httpStatus.BAD_REQUEST,
             success: false,
             message: 'An unknown error occurred',
+            data: updateData,
         });
     }
 };
