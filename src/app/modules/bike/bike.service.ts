@@ -55,9 +55,16 @@ const getAllBikesFromDB = async (query: {
     };
 };
 
+// const getSingleBikeFromDB = async (id: string) => {
+//     const result = await Bike.aggregate([{ $match: { modelNumber: id } }]);
+//     return result;
+// };
 const getSingleBikeFromDB = async (id: string) => {
-    const result = await Bike.aggregate([{ $match: { modelNumber: id } }]);
-    return result;
+    const bike = await Bike.findById(id);
+    if (!bike || bike.isDeleted) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Bike not found');
+    }
+    return bike;
 };
 // const getSingleBikeFromDB = async (id: string) => {
 //     const bike = await Bike.findById(id);
@@ -105,7 +112,7 @@ const getBikeById = async (productId: string) => {
 const deleteBikeFromDB = async (id: string) => {
     const bike = await Bike.findById(id);
 
-    if (!bike) {
+    if (!bike || bike.isDeleted) {
         throw new AppError(httpStatus.NOT_FOUND, "Bike not found");
     }
 
