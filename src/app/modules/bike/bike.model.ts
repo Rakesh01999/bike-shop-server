@@ -1,5 +1,7 @@
 import { Schema, model } from 'mongoose';
-import { TBike,  BikeModel } from './bike.interface';
+import { TBike, BikeModel, BIKE_CATEGORY } from './bike.interface';
+import AppError from '../../errors/AppError';
+import httpStatus from 'http-status';
 // import { TBike, TOrder, BikeModel, OrderModel } from './bike.interface';
 // import validator from 'validator';
 
@@ -23,10 +25,11 @@ const bikeSchema = new Schema<TBike, BikeModel>(
       maxlength: [50, 'Bike name cannot exceed 50 characters'],
       validate: {
         validator: function (value: string) {
-          const firstNameStr = value.charAt(0).toUpperCase() + value.slice(1);
-          console.log(value);
-          console.log(firstNameStr);
-          return firstNameStr === value;
+          return value.charAt(0) === value.charAt(0).toUpperCase();
+          // const firstNameStr = value.charAt(0).toUpperCase() + value.slice(1);
+          // console.log(value);
+          // console.log(firstNameStr);
+          // return firstNameStr === value;
         },
         message: '{VALUE} is not in capitalize format',
       }
@@ -43,7 +46,8 @@ const bikeSchema = new Schema<TBike, BikeModel>(
     },
     category: {
       type: String,
-      enum: ['Mountain', 'Road', 'Hybrid', 'Electric'],
+      // enum: ['Mountain', 'Road', 'Hybrid', 'Electric'],
+      enum: Object.values(BIKE_CATEGORY),
       required: [true, 'Category is required'],
     },
     description: {
@@ -101,13 +105,21 @@ bikeSchema.pre('find', function (next) {
 
 // Static Methods
 bikeSchema.statics.isBikeAvailable = async function (id: string) {
-  return this.findOne({ _id: id, inStock: true });
+  // return this.findOne({ _id: id, inStock: true });
+  const bike = await this.findOne({ _id: id, inStock: true, isDeleted: false });
+  if (!bike) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Bike not found or out of stock');
+  }
+  return bike;
 };
 
 bikeSchema.statics.reduceStock = async function (id: string, quantity: number) {
   const bike = await this.findById(id);
   if (!bike || bike.quantity < quantity) {
     throw new Error('Insufficient stock for the bike.');
+  }
+  if (bike.quantity < quantity) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Insufficient stock');
   }
   bike.quantity -= quantity;
   if (bike.quantity === 0) {
