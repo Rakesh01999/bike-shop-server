@@ -29,6 +29,7 @@ const getAllBikesFromDB = async (query: {
     limit?: number;
     sortBy?: string;
     sortOrder?: "asc" | "desc";
+    category?: string;
 }) => {
     const { filter = {}, page = 1, limit = 10, sortBy = "createdAt", sortOrder = "desc" } = query;
 

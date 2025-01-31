@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { BIKE_CATEGORY } from "./bike.interface";
-// Updated Bike validation schema
 const bikeValidationSchema = z.object({
   modelNumber: z.string({
     required_error: 'Model Number is required'
