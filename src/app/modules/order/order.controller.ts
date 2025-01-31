@@ -9,11 +9,11 @@ import { Order } from "./order.model";
 const createOrder = catchAsync(async (req, res) => {
     const user = req.user;
     // const user = await UserModel.findOne({ email: req.user.email });
-    console.log('f-OC', user);
+    // console.log('f-OC', user);
     
     // const order = await OrderService.createOrderInDB(user, req.body, req.ip!);
     const order = await OrderService.createOrderInDB(user, req.body, req.ip!);
-    console.log('f-OC, order:', order);
+    // console.log('f-OC, order:', order);
     
     sendResponse(res, {
         statusCode: httpStatus.CREATED,

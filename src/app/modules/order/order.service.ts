@@ -22,7 +22,7 @@ const createOrderInDB = async (
 
     // Find the bike
     const bike = await Bike.findById(payload.product);
-    //   console.log('f-OS, Bike:', bike);
+    console.log('f-OS, BikeId :', bike);
     if (!bike) {
         throw new AppError(
             httpStatus.NOT_FOUND,
@@ -51,7 +51,7 @@ const createOrderInDB = async (
         quantity: payload.quantity,
         subtotal: totalPrice,
     };
-    console.log('f-OS, productDetail:', productDetail);
+    // console.log('f-OS, productDetail:', productDetail);
 
     // Create order in the database
     const order = await Order.create({
@@ -61,8 +61,9 @@ const createOrderInDB = async (
         user: user._id,
         products: [productDetail], // Wrap in array since schema expects array
         totalPrice,
+        // status: ,
     });
-    console.log('f-OS, order:', order);
+    // console.log('f-OS, order:', order);
 
     // Prepare SurjoPay payment payload
     const surjopayPayload = {
@@ -79,7 +80,7 @@ const createOrderInDB = async (
 
     // Make payment with SurjoPay
     const payment = await orderUtils.makePayment(surjopayPayload);
-    console.log('f-OS, payment:', payment);
+    // console.log('f-OS, payment:', payment);
 
     if (payment?.transactionStatus) {
         await order.updateOne({
@@ -89,11 +90,12 @@ const createOrderInDB = async (
             },
         });
     }
-    const url = payment.checkout_url;
-    console.log('f-OS, payment-url:', payment.checkout_url);
+    // const url = payment.checkout_url;
+    // console.log('f-OS, payment-url:', payment.checkout_url);
 
     // return { order, payment.checkout_url};
-    return { order, url};
+    // return { order, url };
+    return { order, payment };
 };
 
 const getOrdersFromDB = async () => {
@@ -101,24 +103,54 @@ const getOrdersFromDB = async () => {
     return data;
 };
 
-const verifyPayment = async (orderId: string) => {
-    const order = await Order.findById(orderId);
+// const verifyPayment = async (orderId: string) => {
+//     const order = await Order.findById(orderId);
 
-    if (!order) {
-        throw new AppError(httpStatus.NOT_FOUND, 'Order not found');
+//     if (!order) {
+//         throw new AppError(httpStatus.NOT_FOUND, 'Order not found');
+//     }
+
+//     // Add your payment verification logic here
+//     const verificationResult = await orderUtils.verifyPayment(orderId);
+
+//     if (verificationResult.status === 'success') {
+//         await order.updateOne({
+//             'transaction.status': 'completed',
+//             'transaction.verifiedAt': new Date(),
+//         });
+//     }
+
+//     return order;
+// };
+
+const verifyPayment = async (order_id: string) => {
+    const verifiedPayment = await orderUtils.verifyPaymentAsync(order_id);
+
+    if (verifiedPayment.length) {
+        await Order.findOneAndUpdate(
+            {
+                "transaction.id": order_id,
+            },
+            {
+                "transaction.bank_status": verifiedPayment[0].bank_status,
+                "transaction.sp_code": verifiedPayment[0].sp_code,
+                "transaction.sp_message": verifiedPayment[0].sp_message,
+                "transaction.transactionStatus": verifiedPayment[0].transaction_status,
+                "transaction.method": verifiedPayment[0].method,
+                "transaction.date_time": verifiedPayment[0].date_time,
+                status:
+                    verifiedPayment[0].bank_status == "Success"
+                        ? "Paid"
+                        : verifiedPayment[0].bank_status == "Failed"
+                            ? "Pending"
+                            : verifiedPayment[0].bank_status == "Cancel"
+                                ? "Cancelled"
+                                : "",
+            }
+        );
     }
 
-    // Add your payment verification logic here
-    const verificationResult = await orderUtils.verifyPayment(orderId);
-
-    if (verificationResult.status === 'success') {
-        await order.updateOne({
-            'transaction.status': 'completed',
-            'transaction.verifiedAt': new Date(),
-        });
-    }
-
-    return order;
+    return verifiedPayment;
 };
 
 export const OrderService = {
