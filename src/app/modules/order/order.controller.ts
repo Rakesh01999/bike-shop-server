@@ -1,20 +1,16 @@
+import { Request, Response } from "express";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
-// import { orderService } from "./order.service";
 import httpStatus from "http-status";
 import { OrderService } from "./order.service";
 import { Order } from "./order.model";
-// import { UserModel } from "../User/user.model";
 
-const createOrder = catchAsync(async (req, res) => {
-    const user = req.user;
-    // const user = await UserModel.findOne({ email: req.user.email });
-    // console.log('f-OC', user);
-    
-    // const order = await OrderService.createOrderInDB(user, req.body, req.ip!);
-    const order = await OrderService.createOrderInDB(user, req.body, req.ip!);
-    // console.log('f-OC, order:', order);
-    
+const createOrder = catchAsync(async (req: Request, res: Response) => {
+    const user = req.user; // Assuming authentication middleware sets this
+    const clientIp = req.ip || ""; // Default to empty string if undefined
+
+    const order = await OrderService.createOrderInDB(user, req.body, clientIp);
+
     sendResponse(res, {
         statusCode: httpStatus.CREATED,
         success: true,
@@ -23,22 +19,23 @@ const createOrder = catchAsync(async (req, res) => {
     });
 });
 
-const getOrders = catchAsync(async (req, res) => {
-    const order = await OrderService.getOrdersFromDB();
+
+const getOrders = catchAsync(async (req: Request, res: Response) => {
+    const orders = await OrderService.getOrdersFromDB();
 
     sendResponse(res, {
-        statusCode: httpStatus.CREATED,
+        statusCode: httpStatus.OK,
         success: true,
-        message: "Order retrieved successfully",
-        data: order,
+        message: "Orders retrieved successfully",
+        data: orders,
     });
 });
 
-const verifyPayment = catchAsync(async (req, res) => {
+const verifyPayment = catchAsync(async (req: Request, res: Response) => {
     const order = await OrderService.verifyPayment(req.query.order_id as string);
 
     sendResponse(res, {
-        statusCode: httpStatus.CREATED,
+        statusCode: httpStatus.OK,
         success: true,
         message: "Order verified successfully",
         data: order,
@@ -46,47 +43,35 @@ const verifyPayment = catchAsync(async (req, res) => {
 });
 
 // Calculate total revenue from all orders
-const calculateRevenue = async (req, res) => {
+const calculateRevenue = catchAsync(async (req: Request, res: Response) => {
     try {
         const totalRevenue = await Order.aggregate([
-            { $group: { _id: null, totalRevenue: { $sum: '$totalPrice' } } },
+            { $group: { _id: null, totalRevenue: { $sum: "$totalPrice" } } },
         ]);
 
         const revenue = totalRevenue[0]?.totalRevenue || 0;
 
-        // res.status(200).json({
-        //     success: true,
-        //     message: 'Revenue calculated successfully',
-        //     data: {
-        //         totalRevenue: revenue,
-        //     },
-        // });
         sendResponse(res, {
-            statusCode: httpStatus.CREATED,
+            statusCode: httpStatus.OK,
             success: true,
-            message: "Order retrieved successfully",
+            message: "Revenue calculated successfully",
             data: {
                 totalRevenue: revenue,
             },
         });
     } catch (error: unknown) {
         // Type-safe handling of the error
-        const errorMessage =
-            error instanceof Error ? error.message : 'An unexpected error occurred';
+        const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred";
 
-        console.error('Error calculating revenue:', errorMessage);
-        // res.status(500).json({
-        //     success: false,
-        //     message: errorMessage,
-        // });
+        console.error("Error calculating revenue:", errorMessage);
+
         sendResponse(res, {
-            statusCode: httpStatus.BAD_REQUEST,
+            statusCode: httpStatus.INTERNAL_SERVER_ERROR,
             success: false,
             message: errorMessage,
-            data: res,
+            data: null,
         });
     }
-};
-
+});
 
 export const OrderController = { createOrder, verifyPayment, getOrders, calculateRevenue };

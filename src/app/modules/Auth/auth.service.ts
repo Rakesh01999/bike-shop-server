@@ -136,7 +136,8 @@ const loginUser = async ({ email, password }: { email: string; password: string 
   }
 
   const jwtPayload = {
-    userId: user._id.toString(),
+    // userId: user._id.toString(),
+    userId: user.id.toString(),
     role: user.role,
   };
 
