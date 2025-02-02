@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { BIKE_CATEGORY } from "./bike.interface";
+import { BIKE_CATEGORY, TBikeCategory } from "./bike.interface";
 const bikeValidationSchema = z.object({
   modelNumber: z.string({
     required_error: 'Model Number is required'
@@ -18,7 +18,8 @@ const bikeValidationSchema = z.object({
     ),
   brand: z.string().min(1, "Brand is required"),
   // category: z.enum(["Mountain", "Road", "Hybrid", "Electric"], {
-  category: z.enum(Object.values(BIKE_CATEGORY) as [string, ...string[]], {
+  // category: z.enum(Object.values(BIKE_CATEGORY) as [string, ...string[]], {
+  category: z.enum(Object.values(BIKE_CATEGORY) as [TBikeCategory, ...TBikeCategory[]], {
     required_error: "Category is required",
     invalid_type_error: "Invalid category",
   }),
