@@ -16,6 +16,7 @@ const createOrderInDB = async (
     payload: IOrderPayload,
     client_ip: string
 ) => {
+    console.log('f-OS', payload.product);
     if (!payload?.product) {
         throw new AppError(httpStatus.NOT_ACCEPTABLE, 'Product is not specified');
     }

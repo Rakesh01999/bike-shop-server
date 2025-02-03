@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Shurjopay, { PaymentResponse, VerificationResponse } from "shurjopay";
 import config from "../../config";
 
