@@ -50,6 +50,10 @@ const bikeSchema = new Schema<TBike, BikeModel>(
       enum: Object.values(BIKE_CATEGORY),
       required: [true, 'Category is required'],
     },
+    image: {  // ✅ 
+      type: String,
+      // required: true, // Make it required if necessary
+    },
     description: {
       type: String,
       required: [true, 'Description is required'],

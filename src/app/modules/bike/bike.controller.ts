@@ -47,9 +47,18 @@ import AppError from '../../errors/AppError';
 
 const createBike = catchAsync(async (req: Request, res: Response) => {
     const { bike: bikeData } = req.body;
+    console.log('f-bc,bikeData',bikeData);
     const validatedData = bikeValidationSchema.parse(bikeData);
+    // const transformedData = {
+    //     ...bikeData,
+    //     modelNumber: bikeData.model, // Map 'model' to 'modelNumber'
+    //     image: bikeData.image || '', // Ensure image is never undefined
+    // };
+    // const validatedData = bikeValidationSchema.parse(transformedData);
+    // console.log(validatedData);
     const result = await BikeServices.createBikeInDB(validatedData);
 
+    console.log(result);
     sendResponse(res, {
         statusCode: httpStatus.CREATED,
         success: true,

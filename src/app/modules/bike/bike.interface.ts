@@ -20,6 +20,7 @@ export type TBike = {
     // category: 'Mountain' | 'Road' | 'Hybrid' | 'Electric';
     category: TBikeCategory;
     description: string;
+    image?: string;
     quantity: number;
     inStock: boolean;
     createdAt?: Date;

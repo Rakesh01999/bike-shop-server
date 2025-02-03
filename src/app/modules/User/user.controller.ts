@@ -2,20 +2,50 @@ import { UserServices } from './user.service';
 import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
+import config from '../../config';
 
 const createUser = catchAsync(async (req, res) => {
   // const { user } = req.body;
   // const result = await UserServices.createUserInDB(user);
-  
+
   const result = await UserServices.createUserInDB(req.body);
+  // const { refreshToken, accessToken } = result;
+  res.cookie("refreshToken", refreshToken, {
+    secure: config.NODE_ENV === "production",
+    httpOnly: true,
+  });
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
-    message: 'User is created successfully',
+    message: 'User is Registered successfully',
+    // data: {
+    //   result,
+    //   accessToken
+    // },
     data: result,
   });
 });
+
+const loginUser = catchAsync(async (req, res) => {
+  const result = await UserServices.loginUser(req.body);
+  const { refreshToken, accessToken } = result;
+
+  res.cookie("refreshToken", refreshToken, {
+    secure: config.NODE_ENV === "production",
+    httpOnly: true,
+  });
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User is logged in succesfully ! ",
+    data: {
+      accessToken,
+    },
+  });
+});
+
 
 const getAllUsers = catchAsync(async (req, res) => {
   const result = await UserServices.getAllUsersFromDB(req.query);
@@ -43,8 +73,12 @@ const getSingleUser = catchAsync(async (req, res) => {
 const updateUser = catchAsync(async (req, res) => {
   const { id } = req.params;
   const { user } = req.body;
-
+  console.log('f-uc, req.params:', req.params);
+  console.log('f-uc, id:', id);
+  console.log('f-uc:', user);
+  
   const result = await UserServices.updateUserInDB(id, user);
+  console.log('f-uc:', result);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -67,10 +101,38 @@ const deleteUser = catchAsync(async (req, res) => {
   });
 });
 
+const blockUser = catchAsync(async (req, res) => {
+
+  const { userId } = req.params
+  const result = await UserServices.blockUserInDB(userId)
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User is blocked',
+    data: result,
+  });
+})
+
+const refreshToken = catchAsync(async (req, res) => {
+  const { refreshToken } = req.cookies;
+  const result = await UserServices.refreshToken(refreshToken);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Access token is retrieved succesfully!',
+    data: result,
+  });
+});
+
+
 export const UserControllers = {
   getAllUsers,
   getSingleUser,
   updateUser,
   deleteUser,
   createUser,
+  loginUser,
+  blockUser,
+  refreshToken,
 };

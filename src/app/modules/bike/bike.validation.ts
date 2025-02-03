@@ -17,6 +17,11 @@ const bikeValidationSchema = z.object({
       { message: "Bike name must start with a capital letter" }
     ),
   brand: z.string().min(1, "Brand is required"),
+  image: z.string().optional().default(""),
+  // image: z.string({
+  //   required_error: 'Image URL is required'
+  // }).min(1, "Image URL cannot be empty"),
+
   // category: z.enum(["Mountain", "Road", "Hybrid", "Electric"], {
   // category: z.enum(Object.values(BIKE_CATEGORY) as [string, ...string[]], {
   category: z.enum(Object.values(BIKE_CATEGORY) as [TBikeCategory, ...TBikeCategory[]], {

@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import httpStatus from 'http-status';
 // import jwt, { JwtPayload } from 'jsonwebtoken';
-import { UserModel } from '../User/user.model';
+import { User } from '../User/user.model';
 import AppError from '../../errors/AppError';
 import { createToken } from './auth.utils';
 import config from '../../config';
@@ -16,7 +16,7 @@ const registerUser = async (payload: {
   const { name, email, password } = payload;
 
   // Check if the email is already registered
-  const existingUser = await UserModel.findOne({ email });
+  const existingUser = await User.findOne({ email });
   if (existingUser) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Email is already registered');
   }
@@ -28,8 +28,8 @@ const registerUser = async (payload: {
   // );
 
   // Create and save the user
-  const newUser = await UserModel.create({
-    
+  const newUser = await User.create({
+
     name,
     email,
     password,
@@ -42,7 +42,7 @@ const registerUser = async (payload: {
   //   name: newUser.name,
   //   email: newUser.email,
   // };
-  return newUser ;
+  return newUser;
 };
 
 
@@ -117,7 +117,7 @@ const registerUser = async (payload: {
 // ----------------
 
 const loginUser = async ({ email, password }: { email: string; password: string }) => {
-  const user = await UserModel.findOne({ email });
+  const user = await User.findOne({ email });
 
   if (!user) {
     throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid credentials');
@@ -138,6 +138,7 @@ const loginUser = async ({ email, password }: { email: string; password: string 
   const jwtPayload = {
     // userId: user._id.toString(),
     userId: user.id.toString(),
+    email: user.email,
     role: user.role,
   };
 
@@ -155,6 +156,55 @@ const loginUser = async ({ email, password }: { email: string; password: string 
 };
 
 // ----------------
+
+// const refreshToken = async (token: string) => {
+//   // checking if the given token is valid
+//   const decoded = verifyToken(token, config.jwt_refresh_secret as string);
+
+//   const { userId, iat } = decoded;
+
+//   // checking if the user is exist
+//   const user = await User.isUserExistsById(userId);
+
+//   if (!user) {
+//     throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
+//   }
+//   // checking if the user is already deleted
+//   const isDeleted = user?.isDeleted;
+
+//   if (isDeleted) {
+//     throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted !');
+//   }
+
+//   // checking if the user is blocked
+//   const userStatus = user?.status;
+
+//   if (userStatus === 'blocked') {
+//     throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
+//   }
+
+//   if (
+//     user.passwordChangedAt &&
+//     User.isJWTIssuedBeforePasswordChanged(user.passwordChangedAt, iat as number)
+//   ) {
+//     throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized !');
+//   }
+
+//   const jwtPayload = {
+//     userId: user.id,
+//     role: user.role,
+//   };
+
+//   const accessToken = createToken(
+//     jwtPayload,
+//     config.jwt_access_secret as string,
+//     config.jwt_access_expires_in as string,
+//   );
+
+//   return {
+//     accessToken,
+//   };
+// };
 
 export const AuthServices = {
   registerUser,

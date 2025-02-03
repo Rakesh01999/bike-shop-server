@@ -21,7 +21,8 @@ const moduleRoutes = [
     route: OrderRoutes, // Order management and checkout
   },
   {
-    path: '/users',
+    // path: '/users',
+    path: '/',
     route: UserRoutes, // Manage customers and admins
   },
 ];

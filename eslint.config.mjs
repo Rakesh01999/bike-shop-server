@@ -1,6 +1,8 @@
 import globals from "globals";
 import pluginJs from "@eslint/js";
 import tseslint from "typescript-eslint";
+import jsPlugin from "@eslint/js";
+import tsPlugin from "@typescript-eslint/eslint-plugin";
 
 
 /** @type {import('eslint').Linter.Config[]} */
@@ -19,5 +21,18 @@ export default [
       "no-undef": "error",
       "@typescript-eslint/no-unused-vars": "warn",
     },
+  },
+  jsPlugin.configs.recommended,
+  {
+    files: ["**/*.ts"],
+    plugins: {
+      "@typescript-eslint": tsPlugin,
+    },
+    rules: {
+      ...tsPlugin.configs.recommended.rules,
+    },
+  },
+  {
+    ignores: ["node_modules", "dist"],
   },
 ];
