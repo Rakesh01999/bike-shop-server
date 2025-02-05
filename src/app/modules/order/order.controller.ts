@@ -74,8 +74,7 @@ const createOrder = catchAsync(async (req: Request, res: Response) => {
 
 
 const getOrders = catchAsync(async (req: Request, res: Response) => {
-    const orders = await OrderService.getOrdersFromDB();
-    console.log('f-OC:orders',orders);
+    const orders = await OrderService.getOrdersFromDB(req.query);
     
     sendResponse(res, {
         statusCode: httpStatus.OK,
