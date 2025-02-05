@@ -2,6 +2,7 @@ import express from 'express';
 import { UserControllers } from './user.controller';
 import { createUserValidationSchema, refreshTokenValidationSchema } from './user.validation';
 import validateRequest from '../../middlewares/validateRequest';
+import auth from '../../middlewares/auth';
 
 const router = express.Router();
 
@@ -34,5 +35,12 @@ router.patch('/:id', UserControllers.updateUser);
 router.put('/:userId', UserControllers.blockUser);
 
 router.delete('/:id', UserControllers.deleteUser);
+
+router.post(
+  '/change-password',auth("admin","customer"),
+  // ValidateRequest(changePasswordValidationSchema),
+  UserControllers.changePassword,
+);
+
 
 export const UserRoutes = router;

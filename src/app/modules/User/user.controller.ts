@@ -76,7 +76,7 @@ const updateUser = catchAsync(async (req, res) => {
   console.log('f-uc, req.params:', req.params);
   console.log('f-uc, id:', id);
   console.log('f-uc:', user);
-  
+
   const result = await UserServices.updateUserInDB(id, user);
   console.log('f-uc:', result);
 
@@ -111,7 +111,21 @@ const blockUser = catchAsync(async (req, res) => {
     message: 'User is blocked',
     data: result,
   });
-})
+});
+
+const changePassword = catchAsync(async (req, res) => {
+
+  const { ...passwordData } = req.body;
+
+  const result = await UserServices.changePassword(req.user!, passwordData);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Password is updated succesfully!',
+    data: result,
+  });
+});
+
 
 const refreshToken = catchAsync(async (req, res) => {
   const { refreshToken } = req.cookies;
@@ -135,4 +149,5 @@ export const UserControllers = {
   loginUser,
   blockUser,
   refreshToken,
+  changePassword,
 };

@@ -23,8 +23,8 @@ const createOrderInDB = async (
     payload: IOrderPayload,
     client_ip: string
 ) => {
-    console.log('f-OS', payload);
-    // console.log('f-OS', payload.product);
+    // console.log('f-OS, car:', payload.car);
+    // console.log('f-OS, product:', payload.product);
     payload.product = payload.car;
 
     if (!payload?.product) {
@@ -33,7 +33,7 @@ const createOrderInDB = async (
 
     // Find the bike
     const bike = await Bike.findById(payload.product);
-    // console.log('f-OS, BikeId :', bike);
+    
     if (!bike) {
         throw new AppError(
             httpStatus.NOT_FOUND,
@@ -43,7 +43,6 @@ const createOrderInDB = async (
 
     // Calculate total price
     const totalPrice = bike.price * payload.quantity;
-    // console.log('f-OS, totalPrice:', totalPrice);
 
     // Check stock
     if (bike.quantity < payload.quantity) {
@@ -62,7 +61,6 @@ const createOrderInDB = async (
         quantity: payload.quantity,
         subtotal: totalPrice,
     };
-    // console.log('f-OS, productDetail:', productDetail);
 
     // Create order in the database
     const order = await Order.create({
@@ -74,7 +72,6 @@ const createOrderInDB = async (
         totalPrice,
         // status: ,
     });
-    // console.log('f-OS, order:', order);
 
     // Prepare SurjoPay payment payload
     const surjopayPayload = {
@@ -91,7 +88,6 @@ const createOrderInDB = async (
 
     // Make payment with SurjoPay
     const payment = await orderUtils.makePayment(surjopayPayload);
-    // console.log('f-OS, payment:', payment);
 
     if (payment?.transactionStatus) {
         await order.updateOne({
@@ -102,7 +98,6 @@ const createOrderInDB = async (
         });
     }
     // const url = payment.checkout_url;
-    // console.log('f-OS, payment-url:', payment.checkout_url);
 
     // return { order, payment.checkout_url};
     // return { order, url };

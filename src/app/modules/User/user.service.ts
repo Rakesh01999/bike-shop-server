@@ -7,6 +7,7 @@ import { User } from './user.model';
 import mongoose from 'mongoose';
 import { createToken } from '../Auth/auth.utils';
 import httpStatus from "http-status";
+import bcrypt from 'bcrypt';
 
 // Create a new user in the database
 // const createUserInDB = async (user: TUser): Promise<TUser> => {
@@ -177,6 +178,50 @@ const blockUserInDB = async (id: string): Promise<TUser | null> => {
 };
 
 
+const changePassword = async (
+  userData: JwtPayload,
+  payload: { oldPassword: string; newPassword: string },
+) => {
+
+  const user = await User.isUserExistsById(userData.email);
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
+  }
+
+  const userStatus = user?.status;
+
+  if (userStatus === 'blocked') {
+    throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
+  }
+
+  //checking if the password is correct
+
+  if (!(await User.isPasswordMatched(payload.oldPassword, user?.password)))
+    throw new AppError(httpStatus.FORBIDDEN, 'Password do not matched');
+
+  //hash new password
+  const newHashedPassword = await bcrypt.hash(
+    payload.newPassword,
+    Number(config.bcrypt_salt_rounds),
+  );
+
+  await User.findOneAndUpdate(
+    {
+      email: userData.email,
+      role: userData.role,
+    },
+    {
+      password: newHashedPassword,
+      needsPasswordChange: false,
+      passwordChangedAt: new Date(),
+    },
+  );
+
+  return null;
+};
+
+
 const refreshToken = async (token: string) => {
   // checking if the given token is valid
   const decoded = jwt.verify(
@@ -220,4 +265,5 @@ export const UserServices = {
   deleteUserFromDB,
   blockUserInDB,
   refreshToken,
+  changePassword,
 };
