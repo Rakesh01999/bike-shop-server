@@ -53,7 +53,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
     // checking if the user exists in DB
     // const user = await User.findOne({ email });
 
-    // const user = await User.findById(email);
+    // const user = await User.findOne({email});
     // const user = await User.findById(userId);
     const user = await User.isUserExistsById(email);
 

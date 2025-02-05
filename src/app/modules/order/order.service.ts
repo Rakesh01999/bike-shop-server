@@ -107,7 +107,7 @@ const createOrderInDB = async (
     // return { order, payment.checkout_url};
     // return { order, url };
     // return { order, payment };
-    return payment.checkout_url ;
+    return payment.checkout_url;
 };
 
 // const createOrderInDB = async (Orderdata: ORDER, client_ip?: string) => {
@@ -161,19 +161,38 @@ const createOrderInDB = async (
 
 
 const getOrdersFromDB = async (query: Record<string, unknown>) => {
-    const orderQuery = new QueryBuilder(Order.find(),query)
-    .filter()
-    .sort()
-    .paginate()
-    .fields()
+    const orderQuery = new QueryBuilder(Order.find(), query)
+        .filter()
+        .sort()
+        .paginate()
+        .fields()
     const result = await orderQuery.modelQuery;
     const meta = await orderQuery.countTotal()
     return {
-       result,
-       meta
+        result,
+        meta
     }
-  };
-  
+};
+
+const getMyOrdersFromDB = async (email: string, query: Record<string, unknown>) => {
+
+    const orderQuery = new QueryBuilder(
+        Order.find({ email }), // Filter by user's email
+        query
+    )
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+    const result = await orderQuery.modelQuery;
+    const meta = await orderQuery.countTotal();
+    return {
+        result,
+        meta
+    };
+};
+
 // ---------------- Get Order -------------
 
 
@@ -232,4 +251,5 @@ export const OrderService = {
     createOrderInDB,
     getOrdersFromDB,
     verifyPayment,
+    getMyOrdersFromDB,
 };

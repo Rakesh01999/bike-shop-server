@@ -11,7 +11,7 @@ const createOrder = catchAsync(async (req: Request, res: Response) => {
     const user = req.user; // Assuming authentication middleware sets this
     const clientIp = req.ip || ""; // Default to empty string if undefined
     console.log('f-OC, body', req.body);
-    
+
     const order = await OrderService.createOrderInDB(user, req.body, clientIp);
     console.log('f-OC, order', order);
     sendResponse(res, {
@@ -75,6 +75,21 @@ const createOrder = catchAsync(async (req: Request, res: Response) => {
 
 const getOrders = catchAsync(async (req: Request, res: Response) => {
     const orders = await OrderService.getOrdersFromDB(req.query);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Orders retrieved successfully",
+        data: orders,
+    });
+});
+
+const getMyOrders = catchAsync(async (req: Request, res: Response) => {
+    // Get user from auth middleware
+    const user = req.user;
+    console.log('f-OC, user',user);
+    // Call service with user's email
+    const orders = await OrderService.getMyOrdersFromDB(user.email, req.query);
     
     sendResponse(res, {
         statusCode: httpStatus.OK,
@@ -83,6 +98,7 @@ const getOrders = catchAsync(async (req: Request, res: Response) => {
         data: orders,
     });
 });
+
 
 const verifyPayment = catchAsync(async (req: Request, res: Response) => {
     const order = await OrderService.verifyPayment(req.query.order_id as string);
@@ -127,4 +143,10 @@ const calculateRevenue = catchAsync(async (req: Request, res: Response) => {
     }
 });
 
-export const OrderController = { createOrder, verifyPayment, getOrders, calculateRevenue };
+export const OrderController = {
+    createOrder,
+    verifyPayment,
+    getOrders,
+    calculateRevenue,
+    getMyOrders,
+};
