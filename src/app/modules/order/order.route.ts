@@ -13,5 +13,7 @@ router.post('/verify',auth(USER_ROLE.customer), OrderController.verifyPayment);
 // router.get('/revenue', OrderController.calculateRevenue);
 router.get('/revenue',auth(USER_ROLE.admin), OrderController.calculateRevenue);
 
+router.get('/',auth(USER_ROLE.admin), OrderController.getOrders);
+
 export const OrderRoutes = router;
 
