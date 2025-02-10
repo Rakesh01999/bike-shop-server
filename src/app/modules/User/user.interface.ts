@@ -8,7 +8,8 @@ export interface TUser extends Document {
   email: string;
   password: string;
   profileImg?: string;
-  phone?: string;
+  // phone?: string;
+  phone_number?: string;
   address?: string;
   city?: string;
   needsPasswordChange: boolean;

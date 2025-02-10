@@ -17,7 +17,7 @@ import bcrypt from 'bcrypt';
 
 const createUserInDB = async (payload: TUser) => {
   if (!payload) {
-    throw new AppError(404,'User is undefined or null');
+    throw new AppError(404, 'User is undefined or null');
   }
 
   const existingUser = await User.findOne({ email: payload.email });
@@ -25,7 +25,7 @@ const createUserInDB = async (payload: TUser) => {
   payload.role = 'customer'
 
   if (existingUser) {
-    throw new AppError(404,'Email already exists');
+    throw new AppError(404, 'Email already exists');
   }
   const user = await User.create(payload);
   const jwtPayload = {
@@ -54,14 +54,14 @@ const createUserInDB = async (payload: TUser) => {
 };
 
 const loginUser = async (payload: TUser) => {
-  const user = await User.isUserExistsById(payload.email);  
- 
-  if(!user){
-    throw new AppError(httpStatus.NOT_FOUND,"email is not register")
+  const user = await User.isUserExistsById(payload.email);
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "email is not register")
   }
 
-  if(user.status === 'blocked'){
-     throw new AppError(httpStatus.FORBIDDEN,"user is blocked")
+  if (user.status === 'blocked') {
+    throw new AppError(httpStatus.FORBIDDEN, "user is blocked")
   }
 
   if (!(await User.isPasswordMatched(payload?.password, user?.password))) {
@@ -70,8 +70,8 @@ const loginUser = async (payload: TUser) => {
 
   const jwtPayload = {
     userId: user?.id,
-    email: user?.email ?? "default_email",      
-    role: user?.role ?? "user",                     
+    email: user?.email ?? "default_email",
+    role: user?.role ?? "user",
   };
 
   const accessToken = createToken(
@@ -110,18 +110,47 @@ const getSingleUserFromDB = async (id: string): Promise<TUser | null> => {
 };
 
 // Update a user in the database by ID
+// const updateUserInDB = async (
+//   id: string,
+//   payload: Partial<TUser>,
+// ): Promise<TUser | null> => {
+//   const result = await User.findByIdAndUpdate(id, payload, {
+//     new: true, // Return the updated document
+//     runValidators: true, // Run schema validators
+//   });
+//   if (!result) {
+//     throw new AppError(404, 'User not found for update');
+//   }
+//   return result;
+// };
 const updateUserInDB = async (
-  id: string,
-  payload: Partial<TUser>,
-): Promise<TUser | null> => {
-  const result = await User.findByIdAndUpdate(id, payload, {
-    new: true, // Return the updated document
-    runValidators: true, // Run schema validators
-  });
-  if (!result) {
-    throw new AppError(404, 'User not found for update');
+  userData: JwtPayload,
+  payload: { name?: string; phone_number?: string; address?: string }
+) => {
+  // Check if user exists
+  // const user = await User.findOne({ email: userData.email });
+  console.log('f-us, userData:',userData);
+  const user = await User.isUserExistsById(userData.email);
+  console.log('f-us,payload:',payload);
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found!");
   }
-  return result;
+
+  // Prevent updates for blocked users
+  if (user.status === "blocked") {
+    throw new AppError(httpStatus.FORBIDDEN, "This user is blocked!");
+  }
+
+  // Update user fields if provided
+  if (payload.name) user.name = payload.name;
+  if (payload.phone_number) user.phone_number = payload.phone_number;
+  if (payload.address) user.address = payload.address;
+
+  // Save updated user
+  await user.save();
+
+  return user;
 };
 
 // Soft delete a user by marking them as deleted

@@ -70,20 +70,32 @@ const getSingleUser = catchAsync(async (req, res) => {
   });
 });
 
-const updateUser = catchAsync(async (req, res) => {
-  const { id } = req.params;
-  console.log('f-uc, req.params:', req.params);
-  console.log('f-uc, id:', id);
-  console.log('f-uc,req.body:', req.body);
+// const updateUser = catchAsync(async (req, res) => {
+//   const { id } = req.params;
+//   console.log('f-uc, req.params:', req.params);
+//   console.log('f-uc, id:', id);
+//   console.log('f-uc,req.body:', req.body);
 
-  const result = await UserServices.updateUserInDB(id, req.body);
-  console.log('f-uc:', result);
+//   const result = await UserServices.updateUserInDB(id, req.body);
+//   console.log('f-uc:', result);
+
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     success: true,
+//     message: 'User is updated successfully',
+//     data: result,
+//   });
+// });
+const updateUser = catchAsync(async (req, res) => {
+  const updatedUser = await UserServices.updateUserInDB(req.user!, req.body);
+
+  console.log('f-UC, updatedUser', updatedUser);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'User is updated successfully',
-    data: result,
+    message: "User profile updated successfully!",
+    data: updatedUser,
   });
 });
 

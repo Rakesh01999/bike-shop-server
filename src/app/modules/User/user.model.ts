@@ -16,11 +16,19 @@ const userSchema = new Schema<TUser>(
       required: true,
       trim: true,
     },
+    phone_number: {
+      type: String,
+      trim: true,
+    },
     email: {
       type: String,
       required: true,
       unique: true,
       lowercase: true,
+    },
+    address: {
+      type: String,
+      trim: true,
     },
     password: {
       type: String,

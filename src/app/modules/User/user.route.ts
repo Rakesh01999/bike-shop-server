@@ -3,7 +3,6 @@ import { UserControllers } from './user.controller';
 import { createUserValidationSchema, refreshTokenValidationSchema } from './user.validation';
 import validateRequest from '../../middlewares/validateRequest';
 import auth from '../../middlewares/auth';
-import { USER_ROLE } from './user.constant';
 
 const router = express.Router();
 
@@ -32,8 +31,13 @@ router.get('/users', UserControllers.getAllUsers);
 router.get('/:id', UserControllers.getSingleUser);
 
 // router.patch('/:id', UserControllers.updateUser);
-router.patch('/:id',
-  auth(USER_ROLE.admin, USER_ROLE.customer),
+// router.patch('/:id',
+//   auth(USER_ROLE.admin, USER_ROLE.customer),
+//   UserControllers.updateUser
+// );
+router.patch(
+  "/update-profile",
+  auth("admin", "customer"), // Allow both admins and customers
   UserControllers.updateUser
 );
 
