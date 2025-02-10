@@ -10,10 +10,10 @@ import { Order } from "./order.model";
 const createOrder = catchAsync(async (req: Request, res: Response) => {
     const user = req.user; // Assuming authentication middleware sets this
     const clientIp = req.ip || ""; // Default to empty string if undefined
-    console.log('f-OC, ip:', req.ip);
+    // console.log('f-OC, ip:', req.ip);
 
     const order = await OrderService.createOrderInDB(user, req.body, clientIp);
-    console.log('f-OC, order:', order);
+    // console.log('f-OC, order:', order);
     sendResponse(res, {
         statusCode: httpStatus.CREATED,
         success: true,

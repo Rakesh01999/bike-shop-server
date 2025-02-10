@@ -6,6 +6,9 @@ export interface TOrder extends Document {
     quantity: number;
     totalPrice: number;
     status: "Pending" | "Paid" | "Shipped" | "Completed" | "Cancelled";
+    name?: string;
+    address?: string;
+    phone_number?: number;
     transaction: {
         id: string;
         transactionStatus: string;

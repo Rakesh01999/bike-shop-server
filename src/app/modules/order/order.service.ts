@@ -26,6 +26,8 @@ const createOrderInDB = async (
     // console.log('f-OS, car:', payload.car);
     // console.log('f-OS, product:', payload.product);
     payload.product = payload.car;
+    console.log('f-OS, payload:', payload);
+    console.log('f-OS, user:', user);
 
     if (!payload?.product) {
         throw new AppError(httpStatus.NOT_ACCEPTABLE, 'Product is not specified');
@@ -33,7 +35,7 @@ const createOrderInDB = async (
 
     // Find the bike
     const bike = await Bike.findById(payload.product);
-    
+
     if (!bike) {
         throw new AppError(
             httpStatus.NOT_FOUND,
@@ -64,6 +66,9 @@ const createOrderInDB = async (
 
     // Create order in the database
     const order = await Order.create({
+        name: payload.name,
+        phone_number: payload.phone_number,
+        address: payload.address,
         product: bike._id,
         email: payload.email,
         quantity: payload.quantity,
@@ -81,8 +86,11 @@ const createOrderInDB = async (
         customer_name: user.name,
         customer_email: user.email,
         client_ip,
-        customer_phone: user.phone || 'N/A', // Customer phone
-        customer_address: user.address || 'N/A', // Customer address
+        // customer_phone: user.phone || 'N/A', // Customer phone
+        // customer_address: user.address || 'N/A', // Customer address
+        // customer_city: user.city || 'N/A', // Customer city    
+        customer_phone: payload.phone_number || 'N/A', // Customer phone
+        customer_address: payload.address || 'N/A', // Customer address
         customer_city: user.city || 'N/A', // Customer city    
     };
 
@@ -97,10 +105,8 @@ const createOrderInDB = async (
             },
         });
     }
-    // const url = payment.checkout_url;
 
-    // return { order, payment.checkout_url};
-    // return { order, url };
+    // return { order, payment.checkout_url };
     // return { order, payment };
     return payment.checkout_url;
 };
@@ -175,10 +181,10 @@ const getMyOrdersFromDB = async (email: string, query: Record<string, unknown>) 
         Order.find({ email }), // Filter by user's email
         query
     )
-    .filter()
-    .sort()
-    .paginate()
-    .fields();
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
 
     const result = await orderQuery.modelQuery;
     const meta = await orderQuery.countTotal();

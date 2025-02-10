@@ -72,12 +72,11 @@ const getSingleUser = catchAsync(async (req, res) => {
 
 const updateUser = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const { user } = req.body;
   console.log('f-uc, req.params:', req.params);
   console.log('f-uc, id:', id);
-  console.log('f-uc:', user);
+  console.log('f-uc,req.body:', req.body);
 
-  const result = await UserServices.updateUserInDB(id, user);
+  const result = await UserServices.updateUserInDB(id, req.body);
   console.log('f-uc:', result);
 
   sendResponse(res, {

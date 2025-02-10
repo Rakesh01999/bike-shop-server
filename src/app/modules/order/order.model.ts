@@ -8,6 +8,21 @@ const orderSchema = new Schema<TOrder, OrderModel>(
       required: [true, 'Email is required'],
       trim: true,
     },
+    name: {
+      type: String,
+      required: [true, 'name is required'],
+      trim: true,
+    },
+    address: {
+      type: String,
+      required: [true, 'address is required'],
+      trim: true,
+    },
+    phone_number: {
+      type: String,
+      required: [true, 'phone_number is required'],
+      trim: true,
+    },
     product: {
       // type: Schema.Types.ObjectId,
       type: String,
