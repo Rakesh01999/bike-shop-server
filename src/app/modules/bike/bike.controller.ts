@@ -81,7 +81,8 @@ const getAllBikes = async (req: Request, res: Response): Promise<void> => {
     const query = {
         filter,
         page: Number(page) || 1,
-        limit: Number(limit) || 10,
+        // limit: Number(limit) || 10,
+        limit: Number(limit) || 30,
         sortBy: (sortBy as string) || 'createdAt',
         sortOrder: (sortOrder as 'asc' | 'desc') || 'desc',
     };

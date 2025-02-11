@@ -31,7 +31,8 @@ const getAllBikesFromDB = async (query: {
     sortOrder?: "asc" | "desc";
     category?: string;
 }) => {
-    const { filter = {}, page = 1, limit = 10, sortBy = "createdAt", sortOrder = "desc" } = query;
+    // const { filter = {}, page = 1, limit = 10, sortBy = "createdAt", sortOrder = "desc" } = query;
+    const { filter = {}, page = 1, limit = 30, sortBy = "createdAt", sortOrder = "desc" } = query;
 
     const finalFilter = { ...filter, isDeleted: false }; // Exclude soft-deleted bikes
     const sortOptions: Record<string, 1 | -1> = { [sortBy]: sortOrder === "asc" ? 1 : -1 };
