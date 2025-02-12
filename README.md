@@ -1,217 +1,125 @@
+# Bike Shop Backend
 
-# Bike Shop
-## Bike Management System
+## 📌 Project Overview
+The **Bike Shop Backend** is the server-side application that powers the **Bike Shop** e-commerce platform. It is built using **Node.js, Express.js, and MongoDB**, providing RESTful APIs for managing bikes, user authentication, orders, and payments.
 
-A Bike Management System built with Express.js, MongoDB, and TypeScript that allows users to manage bike information including CRUD operations such as creating, reading, updating, and deleting bikes, as well as searching bikes by various parameters.
+## 🚀 Features
+- **User Authentication** (JWT-based login, register, password reset)
+- **Role-Based Access Control** (Admin, Customer)
+- **Bike Management** (CRUD operations for bike listings)
+- **Order Processing** (Order placement, tracking, and history)
+- **Payment Integration** (Shurjopay payment gateway)
+- **Image Uploads** (Cloudinary integration for storing images)
+- **Secure API Endpoints** (Middleware authentication & validation)
 
-## Features
+## 🛠️ Tech Stack
+- **Backend**: Node.js, Express.js
+- **Database**: MongoDB (Mongoose ORM)
+- **Authentication**: JWT, bcrypt.js
+- **Cloud Storage**: Cloudinary
+- **Payment Gateway**: Shurjopay
+- **API Documentation**: Swagger
+- **Environment Variables**: dotenv
 
-- **Create Bike**: Add new bikes to the system with necessary details such as name, brand, and category.
-- **Get All Bikes**: Fetch a list of bikes with optional search filtering by name, brand, or category.
-- **Get Bike by ID or Model Number**: Retrieve a specific bike's information using either its unique ID or model number.
-- **Update Bike**: Modify existing bike information.
-- **Delete Bike**: Soft delete a bike from the system (mark as deleted).
-- **Search Functionality**: Flexible search filtering that allows users to search bikes by name, brand, or category.
-  
-## Tech Stack
-
-- **Backend Framework**: Express.js
-- **Database**: MongoDB (Mongoose)
-- **Validation**: Zod (for bike data validation)
-- **TypeScript**: TypeScript is used for type safety across the application.
-
-## Prerequisites
-
-Before setting up the project, make sure you have the following installed:
-
-- **Node.js** (v14 or higher)
-- **npm** (v6 or higher)
-- **MongoDB** (locally or use MongoDB Atlas)
-
-## Installation
-
-### Step 1: Clone the Repository
-
-Clone the repository to your local machine:
-
-```bash
-git clone https://github.com/your-username/bike-management-system.git
-cd bike-management-system
+## 📂 Project Structure
+```
+backend/
+├── src/
+│   ├── controllers/        # Handles request logic
+│   ├── models/             # Mongoose schemas
+│   ├── routes/             # API endpoints
+│   ├── middleware/         # Authentication & validation
+│   ├── config/             # Database & environment configs
+│   ├── utils/              # Helper functions
+│   ├── app.js              # Express app initialization
+│   ├── server.js           # Main server file
+├── .env                    # Environment variables
+├── package.json            # Dependencies & scripts
+└── README.md               # Documentation
 ```
 
-### Step 2: Install Dependencies
-
-Install the necessary dependencies using npm:
-
-```bash
+## 📦 Installation & Setup
+### 1️⃣ Clone the Repository
+```sh
+git clone https://github.com/yourusername/bike-shop-backend.git
+cd bike-shop-backend
+```
+### 2️⃣ Install Dependencies
+```sh
 npm install
 ```
-
-### Step 3: Set Up Environment Variables
-
-Create a `.env` file in the root directory of the project. This file will contain sensitive information like your MongoDB connection string.
-
-Here’s an example `.env` file:
-
+### 3️⃣ Configure Environment Variables
+Create a `.env` file and add the following:
 ```
-MONGO_URI=mongodb://localhost:27017/bike-management
 PORT=5000
+DATABASE_URL=<your-mongodb-connection-string>
+JWT_ACCESS_SECRET=<your-jwt-access-secret>
+JWT_REFRESH_SECRET=<your-jwt-refresh-secret>
+CLOUDINARY_CLOUD_NAME=<your-cloudinary-name>
+CLOUDINARY_API_KEY=<your-cloudinary-api-key>
+CLOUDINARY_API_SECRET=<your-cloudinary-api-secret>
+SP_ENDPOINT=https://sandbox.shurjopayment.com
+SP_USERNAME=sp_sandbox
+SP_PASSWORD=pyyk97hu&6u6
+SP_RETURN_URL=https://yourfrontend.com/order/verify
 ```
 
-- `MONGO_URI`: Your MongoDB connection URI (use your local or Atlas database connection string).
-- `PORT`: The port on which the server will run (default is `5000`).
-
-### Step 4: Run the Project
-
-Start the server with:
-
-```bash
-npm start
+### 4️⃣ Start the Server
+```sh
+npm run dev  # For development (nodemon)
+npm start    # For production
 ```
 
-The server will be running on `http://localhost:5000`.
+## 🔥 API Endpoints
+### 🛡️ **Auth Routes**
+| Method | Endpoint         | Description |
+|--------|----------------|-------------|
+| POST   | /api/v1/auth/register | Register a new user |
+| POST   | /api/v1/auth/login    | User login |
+| GET    | /api/v1/auth/profile  | Get user profile (protected) |
 
-### Step 5: Access the API Endpoints
+### 🚴 **Bike Management**
+| Method | Endpoint         | Description |
+|--------|----------------|-------------|
+| GET    | /api/v1/bikes        | Get all bikes |
+| POST   | /api/v1/bikes        | Add a new bike (Admin only) |
+| GET    | /api/v1/bikes/:id    | Get a single bike |
+| PUT    | /api/v1/bikes/:id    | Update a bike (Admin only) |
+| DELETE | /api/v1/bikes/:id    | Delete a bike (Admin only) |
 
-Once the server is up, you can access the following API endpoints:
+### 🛒 **Orders**
+| Method | Endpoint         | Description |
+|--------|----------------|-------------|
+| POST   | /api/v1/orders   | Place an order |
+| GET    | /api/v1/orders   | Get user orders |
+| GET    | /api/v1/orders/:id | Get order details |
 
-- **POST** `/api/bikes` – Create a new bike
-- **GET** `/api/bikes` – Get all bikes (with optional search query)
-- **GET** `/api/bikes/:bikeId` – Get a specific bike by its ID or model number
-- **PUT** `/api/bikes/:bikeId` – Update a bike by its ID
-- **DELETE** `/api/bikes/:bikeId` – Soft delete a bike
+### 💳 **Payments**
+| Method | Endpoint          | Description |
+|--------|-----------------|-------------|
+| POST   | /api/v1/payments | Process payment |
 
-## API Documentation
+## 🐳 Deployment
+### 🚀 Deploy on Vercel
+1. Install Vercel CLI:
+   ```sh
+   npm install -g vercel
+   ```
+2. Deploy:
+   ```sh
+   vercel
+   ```
 
-1. **Create Bike**  
-   - **Endpoint**: `POST /api/bikes`
-   - **Body**:  
-     ```json
-     {
-       "bike": {
-         "name": "Mountain Bike",
-         "brand": "Xtreme",
-         "category": "Mountain",
-         "price": 300,
-         "isDeleted": false
-       }
-     }
-     ```
-   - **Response**:  
-     ```json
-     {
-       "success": true,
-       "message": "Bike created successfully",
-       "data": {
-         "_id": "bikeId",
-         "name": "Mountain Bike",
-         "brand": "Xtreme",
-         "category": "Mountain",
-         "price": 300,
-         "isDeleted": false
-       }
-     }
-     ```
+### 🚀 Deploy on Render
+1. Create a new **Web Service** on Render.
+2. Set environment variables in Render **Settings**.
+3. Deploy directly from GitHub.
 
-2. **Get All Bikes**  
-   - **Endpoint**: `GET /api/bikes`
-   - **Query Parameters**:  
-     - `searchTerm`: (Optional) String to search in bike name, brand, or category.
-   - **Response**:  
-     ```json
-     {
-       "success": true,
-       "message": "Bikes fetched successfully",
-       "data": [
-         {
-           "_id": "bikeId",
-           "name": "Mountain Bike",
-           "brand": "Xtreme",
-           "category": "Mountain",
-           "price": 300,
-           "isDeleted": false
-         }
-       ]
-     }
-     ```
+## 🎯 Contribution
+1. Fork the repository
+2. Create a new branch (`feature/new-feature`)
+3. Commit your changes
+4. Push to your forked repo
+5. Create a Pull Request (PR)
 
-3. **Get Bike by ID or Model Number**  
-   - **Endpoint**: `GET /api/bikes/:identifier`
-   - **Response**:  
-     ```json
-     {
-       "success": true,
-       "message": "Bike retrieved successfully",
-       "data": {
-         "_id": "bikeId",
-         "name": "Mountain Bike",
-         "brand": "Xtreme",
-         "category": "Mountain",
-         "price": 300,
-         "isDeleted": false
-       }
-     }
-     ```
 
-4. **Update Bike**  
-   - **Endpoint**: `PUT /api/bikes/:bikeId`
-   - **Body**:  
-     ```json
-     {
-       "name": "Updated Bike Name",
-       "brand": "Updated Brand",
-       "category": "Updated Category",
-       "price": 400,
-       "isDeleted": false
-     }
-     ```
-   - **Response**:  
-     ```json
-     {
-       "success": true,
-       "message": "Bike updated successfully",
-       "data": {
-         "_id": "bikeId",
-         "name": "Updated Bike Name",
-         "brand": "Updated Brand",
-         "category": "Updated Category",
-         "price": 400,
-         "isDeleted": false
-       }
-     }
-     ```
-
-5. **Delete Bike**  
-   - **Endpoint**: `DELETE /api/bikes/:bikeId`
-   - **Response**:  
-     ```json
-     {
-       "success": true,
-       "message": "Bike deleted successfully",
-       "data": {
-         "_id": "bikeId",
-         "name": "Deleted Bike",
-         "isDeleted": true
-       }
-     }
-     ```
-
-## Running Tests
-
-To run tests, use:
-
-```bash
-npm run test
-```
-
-Make sure to write tests for your endpoints using a testing framework such as Jest or Mocha.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- [Zod](https://github.com/colinhacks/zod) for validation.
-- [Express.js](https://expressjs.com/) for building the API.
-- [MongoDB](https://www.mongodb.com/) for database management.
