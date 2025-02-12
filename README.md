@@ -60,7 +60,7 @@ CLOUDINARY_API_KEY=<your-cloudinary-api-key>
 CLOUDINARY_API_SECRET=<your-cloudinary-api-secret>
 SP_ENDPOINT=https://sandbox.shurjopayment.com
 SP_USERNAME=sp_sandbox
-SP_PASSWORD=pyyk97hu&6u6
+SP_PASSWORD=code
 SP_RETURN_URL=https://yourfrontend.com/order/verify
 ```
 
