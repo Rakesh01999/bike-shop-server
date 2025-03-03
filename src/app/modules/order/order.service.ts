@@ -26,8 +26,8 @@ const createOrderInDB = async (
     // console.log('f-OS, car:', payload.car);
     // console.log('f-OS, product:', payload.product);
     payload.product = payload.car;
-    console.log('f-OS, payload:', payload);
-    console.log('f-OS, user:', user);
+    // console.log('f-OS, payload:', payload);
+    // console.log('f-OS, user:', user);
 
     if (!payload?.product) {
         throw new AppError(httpStatus.NOT_ACCEPTABLE, 'Product is not specified');
@@ -96,7 +96,7 @@ const createOrderInDB = async (
 
     // Make payment with SurjoPay
     const payment = await orderUtils.makePayment(surjopayPayload);
-
+    
     if (payment?.transactionStatus) {
         await order.updateOne({
             transaction: {
@@ -105,6 +105,7 @@ const createOrderInDB = async (
             },
         });
     }
+    console.log('f-OS, payment-url:', payment.checkout_url);
 
     // return { order, payment.checkout_url };
     // return { order, payment };
