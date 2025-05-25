@@ -4,7 +4,7 @@
 The **Bike Shop Backend** is the server-side application that powers the **Bike Shop** e-commerce platform. It is built using **Node.js, Express.js, and MongoDB**, providing RESTful APIs for managing bikes, user authentication, orders, and payments.
 
 ## Live Link
-(Live-Server)[https://bike-shop-server-six.vercel.app/]
+[Live-Server](https://bike-shop-server-six.vercel.app/)
 
 ## 🚀 Features
 - **User Authentication** (JWT-based login, register, password reset)
